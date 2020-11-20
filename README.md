@@ -1,0 +1,2 @@
+# pyvirus
+Projekt in Informatikwerstatt

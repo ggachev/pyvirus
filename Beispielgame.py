@@ -1,11 +1,12 @@
 # Pygame Beispiel
-import os, sys, pygame, pygame.locals
+import os, sys, pygame, pygame.locals, random
+#import /Projekt/kleineViren
 
 # Initialisieren von PyGame
 pygame.init()
 
 # Fenster öffnen
-screen =pygame.display.set_mode((1280, 800))
+screen =pygame.display.set_mode((1200, 800))
 
 # Titel für Fensterkopf
 pygame.display.set_caption('PyVirus')
@@ -17,42 +18,71 @@ clock = pygame.time.Clock()
 spielaktiv = True
 
 # Liste für Zustände für die Richtungen des Virus + Variable, der immer ein Zustand zugeordnet wird
-richtung =["Oben", "Unten", "Links", "Rechts", "Nichts"]
-zustand = richtung[4]
+zustandsliste =["Oben", "Unten", "Links", "Rechts", "Nichts", "Gameover"]
 
-# Spielzustand vorbereiten
-x = 640
-y = 400
+# Startzustand auf Nichts setzen
+zustand = zustandsliste[4]
+
+# Startlaenge
+laengeObjekt1 = 1
+
+# Spielzustand vorbereiten [x, y]
+positionObjekt1 = [600, 400]
+
+# Liste fuer die kleine Viren
+kleinVirus = []
+
+# Zaehler auf 0 setzen
+zaehler = 0
+
+# Funktion um kleine Viren zu erstellen
+def kleineViren(x, y, laenge, z, s, liste):
+
+    z += 1
+    if z == 200:
+        randomx = random.randrange(0, 1150)
+        print(randomx)
+        while not (randomx >= x+100 or randomx <= x-100):
+            randomx = random.randrange(0, 1150)
+
+        pygame.draw.rect(s, (255, 20, 147), (randomx, 200, 50, 50))
+        z = 0
+    return liste
 
 # Schleife Hauptprogramm
 while spielaktiv:
     # Prüfung, in welche Richtung sich der Spieler automatisch nach vorne bewegen soll.
 
-    if zustand == richtung[0]:
-        if y != 0:
-            y -=0.5
+    if zustand == zustandsliste[0]:
+        if positionObjekt1[1] != 0:
+            positionObjekt1[1] -=0.5
         else:
-            zustand = richtung[4]
+            zustand = zustandsliste[5]
+            print(zustandsliste[5])
 
-    if zustand == richtung[1]:
-        if y != 750: # 50 abziehen, wegen Objektlaenge
-            y +=0.5
+    if zustand == zustandsliste[1]:
+        if positionObjekt1[1] != 750: # 50 abziehen, wegen Objektlaenge
+            positionObjekt1[1] +=0.5
         else:
-            zustand = richtung[4]
+            zustand = zustandsliste[5]
+            print(zustandsliste[5])
 
-    if zustand == richtung[2]:
-        if x != 0:
-            x -=0.5
+    if zustand == zustandsliste[2]:
+        if positionObjekt1[0] != 0:
+            positionObjekt1[0] -=0.5
         else:
-            zustand = richtung[4]
+            zustand = zustandsliste[5]
+            print(zustandsliste[5])
 
-    if zustand == richtung[3]:
-        if x != 1230: # 50 abziehen, wegen Objektlaenge
-            x +=0.5
+    if zustand == zustandsliste[3]:
+        if positionObjekt1[0] != 1150: # 50 abziehen, wegen Objektlaenge
+            positionObjekt1[0] +=0.5
         else:
-            zustand = richtung[4]
-    #  if (x == 1280) or (x == 0 ) or (y == 800 ) or (y == 0):
-    #   zustand = richtung[4]
+            zustand = zustandsliste[5]
+            print(zustandsliste[5])
+    if zustand == zustandsliste[5]:
+        positionObjekt1[0] = 600
+        positionObjekt1[1] = 400
 
 # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
     for event in pygame.event.get():
@@ -63,23 +93,27 @@ while spielaktiv:
 
 # Aktualisieren des Zustands
     if pygame.key.get_pressed()[pygame.locals.K_LEFT]:
-        zustand = richtung[2]
+        zustand = zustandsliste[2]
     if pygame.key.get_pressed()[pygame.locals.K_RIGHT]:
-        zustand = richtung[3]
+        zustand = zustandsliste[3]
     if pygame.key.get_pressed()[pygame.locals.K_UP]:
-        zustand  = richtung[0]
+        zustand  = zustandsliste[0]
     if pygame.key.get_pressed()[pygame.locals.K_DOWN]:
-        zustand = richtung[1]
+        zustand = zustandsliste[1]
 
 # Spiellogik hier integrieren
+
+    kleinVirus = kleineViren(positionObjekt1[0], positionObjekt1[1], laengeObjekt1, zaehler, screen, kleinVirus)
+
 
 
 # Spielfeld/figur(en) zeichnen (davor Spielfeld löschen)
 # RGB Schwarz -> 0, 0, 0
 # RGB Pink -> 255, 20, 147
 # RGB Dark Grey -> 64, 64, 64
-    screen.fill((0, 0, 0))  # Dark Gray
-    pygame.draw.rect(screen, (255, 20, 147), (x,y,50,50))
+    screen.fill((0, 0, 0))  # Black
+    pygame.draw.rect(screen, (255, 20, 147), (positionObjekt1[0],positionObjekt1[1],50,50))
+
 
 # Fenster aktualisieren
     pygame.display.flip()

@@ -30,24 +30,47 @@ laengeObjekt1 = 1
 positionObjekt1 = [600, 400]
 
 # Liste fuer die kleine Viren
-kleinVirus = []
+kleinVirus = {
+    "PositionX" : 0,
+    "PositionY" : 0,
+    "Zaehler" : 199,
+    "R" : 140,
+    "G" : 140,
+    "B" : 140
+}
 
-# Zaehler auf 0 setzen
-zaehler = 0
+# Virus Bilder
+HauptVirus = pygame.image.load('Hauptvirus.png')
+virusGruen = pygame.image.load('Virus_Gruen_edited_50x50.png')
 
 # Funktion um kleine Viren zu erstellen
-def kleineViren(x, y, laenge, z, s, liste):
+def kleineViren(x, y, laenge, dictionary, zustand):
+    z = dictionary["Zaehler"]
+    if zustand != "Nichts" and zustand != "Gameover":
+        z += 1
+        if z == 200:
+            randomr = random.randrange(140, 255)
+            randomg = random.randrange(140, 255)
+            randomb = random.randrange(140, 255)
 
-    z += 1
-    if z == 200:
-        randomx = random.randrange(0, 1150)
-        print(randomx)
-        while not (randomx >= x+100 or randomx <= x-100):
+            dictionary["R"] = randomr
+            dictionary["G"] = randomg
+            dictionary["B"] = randomb
+
             randomx = random.randrange(0, 1150)
+            randomy = random.randrange(0, 750)
 
-        pygame.draw.rect(s, (255, 20, 147), (randomx, 200, 50, 50))
-        z = 0
-    return liste
+            while not (randomx >= x+100 or randomx <= x-100):
+                randomx = random.randrange(0, 1150)
+            dictionary["PositionX"] = randomx
+
+            while not (randomy >= y+100 or randomy <= y-100):
+                randomy = random.randrange(0, 750)
+            dictionary["PositionY"] = randomy
+            z = 0
+
+        dictionary["Zaehler"] = z
+    return dictionary
 
 # Schleife Hauptprogramm
 while spielaktiv:
@@ -80,6 +103,7 @@ while spielaktiv:
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
+    # Zuruecksetzen der Zustand, wenn der Rand getroffen wurde
     if zustand == zustandsliste[5]:
         positionObjekt1[0] = 600
         positionObjekt1[1] = 400
@@ -103,17 +127,19 @@ while spielaktiv:
 
 # Spiellogik hier integrieren
 
-    kleinVirus = kleineViren(positionObjekt1[0], positionObjekt1[1], laengeObjekt1, zaehler, screen, kleinVirus)
-
-
+    kleinVirus = kleineViren(positionObjekt1[0], positionObjekt1[1], laengeObjekt1, kleinVirus, zustand)
 
 # Spielfeld/figur(en) zeichnen (davor Spielfeld löschen)
 # RGB Schwarz -> 0, 0, 0
 # RGB Pink -> 255, 20, 147
 # RGB Dark Grey -> 64, 64, 64
+# RGB White -> 255, 255, 255
     screen.fill((0, 0, 0))  # Black
-    pygame.draw.rect(screen, (255, 20, 147), (positionObjekt1[0],positionObjekt1[1],50,50))
-
+    #pygame.draw.rect(screen, (255, 20, 147), (positionObjekt1[0],positionObjekt1[1],50,50))
+    if zustand != "Nichts" and zustand != "Gameover":
+        pygame.draw.rect(screen, (kleinVirus["R"], kleinVirus["G"], kleinVirus["B"]), (kleinVirus["PositionX"], kleinVirus["PositionY"], 50, 50))
+    #screen.blit(virusGruen, (200, 200))
+    screen.blit(HauptVirus, (positionObjekt1[0],positionObjekt1[1]))
 
 # Fenster aktualisieren
     pygame.display.flip()

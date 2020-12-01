@@ -23,39 +23,60 @@ zustandsliste =["Oben", "Unten", "Links", "Rechts", "Nichts", "Gameover"]
 # Startzustand auf Nichts setzen
 zustand = zustandsliste[4]
 
-# Startlaenge
-laengeObjekt1 = 1
-
-# Spielzustand vorbereiten [x, y]
-positionObjekt1 = [600, 400]
-
-# Liste fuer die kleine Viren
-kleinVirus = {
-    "PositionX" : 0,
-    "PositionY" : 0,
-    "Zaehler" : 199,
-    "R" : 140,
-    "G" : 140,
-    "B" : 140
+# Hauptvirus Dictionary
+eigenschaftenHauptvirus = {
+    "PositionX" : 600,
+    "PositionY" : 400,
+    "Laenge" : 1
 }
 
-# Virus Bilder
-HauptVirus = pygame.image.load('Hauptvirus.png')
-virusGruen = pygame.image.load('Virus_Gruen_edited_50x50.png')
+# Liste fuer die kleine Viren
+eigenschaftenKleinVirus = {
+    "PositionX" : 0,
+    "PositionY" : 0,
+    "Zaehler" : 999,
+    "Bild" : 0
+}
+
+# Virus Bilder - Idee von https://pythonprogramming.net/displaying-images-pygame/
+hauptVirus = pygame.image.load('kleineViren1.png')
+# Bild verkleinern https://stackoverflow.com/questions/43046376/how-to-change-an-image-size-in-pygame/43053791
+hauptVirus = pygame.transform.scale(hauptVirus, (50, 50))
+
+virusRot = pygame.image.load('kleineViren2.png')
+virusOrange = pygame.image.load('kleineViren3.png')
+virusGelb = pygame.image.load('kleineViren4.png')
+virusGruen = pygame.image.load('kleineViren5.png')
+virusBlau = pygame.image.load('kleineViren6.png')
+virusLila = pygame.image.load('kleineViren7.png')
+virusPink = pygame.image.load('kleineViren8.png')
+virusGrau = pygame.image.load('kleineViren9.png')
+
+# Liste mit Bilder
+virusBilderold =[virusRot, virusOrange, virusGelb, virusGruen, virusBlau, virusLila, virusPink, virusGrau]
+virusBilder = []
+
+# Virenbilder resize
+for Bild in virusBilderold:
+    Bild = pygame.transform.scale(Bild, (50, 50))
+    virusBilder.append(Bild)
+
+# Kollisionspruefung
+def collisionPruefung(hauptVirus, kleinVirus):
+    if not (hauptVirus["PositionX"] >= kleinVirus["PositionX"]+50 or hauptVirus["PositionX"] <= kleinVirus["PositionX"] - 50) and not (hauptVirus["PositionY"] >= kleinVirus["PositionY"]+50 or hauptVirus["PositionY"] <= kleinVirus["PositionY"] - 50):
+        hauptVirus["Laenge"] += 1
+        kleinVirus["Zaehler"] = 999
 
 # Funktion um kleine Viren zu erstellen
-def kleineViren(x, y, laenge, dictionary, zustand):
+def kleineViren(x, y, dictionary, zustand, viren):
     z = dictionary["Zaehler"]
     if zustand != "Nichts" and zustand != "Gameover":
         z += 1
-        if z == 200:
-            randomr = random.randrange(140, 255)
-            randomg = random.randrange(140, 255)
-            randomb = random.randrange(140, 255)
+        if z == 1000:
 
-            dictionary["R"] = randomr
-            dictionary["G"] = randomg
-            dictionary["B"] = randomb
+            randomvirus = random.randrange(0, 7)
+            randomvirus = viren[randomvirus]
+            dictionary["Bild"] = randomvirus
 
             randomx = random.randrange(0, 1150)
             randomy = random.randrange(0, 750)
@@ -77,36 +98,36 @@ while spielaktiv:
     # Prüfung, in welche Richtung sich der Spieler automatisch nach vorne bewegen soll.
 
     if zustand == zustandsliste[0]:
-        if positionObjekt1[1] != 0:
-            positionObjekt1[1] -=0.5
+        if eigenschaftenHauptvirus["PositionY"] != 0:
+            eigenschaftenHauptvirus["PositionY"] -=0.5
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
 
     if zustand == zustandsliste[1]:
-        if positionObjekt1[1] != 750: # 50 abziehen, wegen Objektlaenge
-            positionObjekt1[1] +=0.5
+        if eigenschaftenHauptvirus["PositionY"] != 750: # 50 abziehen, wegen Objektlaenge
+            eigenschaftenHauptvirus["PositionY"] +=0.5
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
 
     if zustand == zustandsliste[2]:
-        if positionObjekt1[0] != 0:
-            positionObjekt1[0] -=0.5
+        if eigenschaftenHauptvirus["PositionX"] != 0:
+            eigenschaftenHauptvirus["PositionX"] -=0.5
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
 
     if zustand == zustandsliste[3]:
-        if positionObjekt1[0] != 1150: # 50 abziehen, wegen Objektlaenge
-            positionObjekt1[0] +=0.5
+        if eigenschaftenHauptvirus["PositionX"] != 1150: # 50 abziehen, wegen Objektlaenge
+            eigenschaftenHauptvirus["PositionX"] +=0.5
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
     # Zuruecksetzen der Zustand, wenn der Rand getroffen wurde
     if zustand == zustandsliste[5]:
-        positionObjekt1[0] = 600
-        positionObjekt1[1] = 400
+        eigenschaftenHauptvirus["PositionX"] = 600
+        eigenschaftenHauptvirus["PositionY"] = 400
 
 # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
     for event in pygame.event.get():
@@ -127,24 +148,21 @@ while spielaktiv:
 
 # Spiellogik hier integrieren
 
-    kleinVirus = kleineViren(positionObjekt1[0], positionObjekt1[1], laengeObjekt1, kleinVirus, zustand)
+    eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus, zustand, virusBilder)
+
+    collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus)
 
 # Spielfeld/figur(en) zeichnen (davor Spielfeld löschen)
-# RGB Schwarz -> 0, 0, 0
-# RGB Pink -> 255, 20, 147
-# RGB Dark Grey -> 64, 64, 64
-# RGB White -> 255, 255, 255
-    screen.fill((0, 0, 0))  # Black
-    #pygame.draw.rect(screen, (255, 20, 147), (positionObjekt1[0],positionObjekt1[1],50,50))
+    screen.fill((0, 0, 0))  # Black R,G,B
     if zustand != "Nichts" and zustand != "Gameover":
-        pygame.draw.rect(screen, (kleinVirus["R"], kleinVirus["G"], kleinVirus["B"]), (kleinVirus["PositionX"], kleinVirus["PositionY"], 50, 50))
-    #screen.blit(virusGruen, (200, 200))
-    screen.blit(HauptVirus, (positionObjekt1[0],positionObjekt1[1]))
+        screen.blit(eigenschaftenKleinVirus["Bild"], (eigenschaftenKleinVirus["PositionX"], eigenschaftenKleinVirus["PositionY"]))
+#Hauptvirus zeichnen
+    screen.blit(hauptVirus, (eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"]))
 
 # Fenster aktualisieren
     pygame.display.flip()
 
 # Refresh-Zeiten festlegen
-    clock.tick(100)
+    clock.tick(110)
 
 pygame.quit()

@@ -39,18 +39,18 @@ eigenschaftenKleinVirus = {
 }
 
 # Virus Bilder - Idee von https://pythonprogramming.net/displaying-images-pygame/
-hauptVirus = pygame.image.load('kleineViren1.png')
+hauptVirus = pygame.image.load('rsz_kleineviren1.png')
 # Bild verkleinern https://stackoverflow.com/questions/43046376/how-to-change-an-image-size-in-pygame/43053791
 hauptVirus = pygame.transform.scale(hauptVirus, (50, 50))
 
-virusRot = pygame.image.load('kleineViren2.png')
-virusOrange = pygame.image.load('kleineViren3.png')
-virusGelb = pygame.image.load('kleineViren4.png')
-virusGruen = pygame.image.load('kleineViren5.png')
-virusBlau = pygame.image.load('kleineViren6.png')
-virusLila = pygame.image.load('kleineViren7.png')
-virusPink = pygame.image.load('kleineViren8.png')
-virusGrau = pygame.image.load('kleineViren9.png')
+virusRot = pygame.image.load('rsz_kleineviren2.png')
+virusOrange = pygame.image.load('rsz_kleineviren3.png')
+virusGelb = pygame.image.load('rsz_kleineviren4.png')
+virusGruen = pygame.image.load('rsz_kleineviren5.png')
+virusBlau = pygame.image.load('rsz_kleineviren6.png')
+virusLila = pygame.image.load('rsz_kleineviren7.png')
+virusPink = pygame.image.load('rsz_kleineviren8.png')
+virusGrau = pygame.image.load('rsz_kleineviren9.png')
 
 # Liste mit Bilder
 virusBilderold =[virusRot, virusOrange, virusGelb, virusGruen, virusBlau, virusLila, virusPink, virusGrau]

@@ -11,3 +11,5 @@ Verlauf:
 27.11.2020 - Virus Bild hinzugefuegt, kleine Viren erscheinen sporadisch, noch als quadrate
 
 01.12.2020 - kleine Viren erscheinen als zufaellige Bilder, Kollisionspruefung funktioniert
+
+02.12.2020 - Versuch den kelinen Virus an dem Grossen anzuhaengen

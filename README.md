@@ -13,3 +13,5 @@ Verlauf:
 01.12.2020 - kleine Viren erscheinen als zufaellige Bilder, Kollisionspruefung funktioniert
 
 02.12.2020 - Versuch den kelinen Virus an dem Grossen anzuhaengen
+
+03.12.2020 - Kleine Viren können angehängt werden, diese können sich aber noch nicht bewegen

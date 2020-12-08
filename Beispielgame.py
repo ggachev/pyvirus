@@ -6,7 +6,10 @@ import os, sys, pygame, pygame.locals, random
 pygame.init()
 
 # Fenster öffnen
-screen =pygame.display.set_mode((1200, 800))
+screenBreite = 1200
+screenHoehe = 800
+
+screen =pygame.display.set_mode((screenBreite, screenHoehe))
 
 # Titel für Fensterkopf
 pygame.display.set_caption('PyVirus')
@@ -22,9 +25,6 @@ zustandsliste =["Oben", "Unten", "Links", "Rechts", "Nichts", "Gameover"]
 
 # Startzustand auf Nichts setzen
 zustand = zustandsliste[4]
-
-# Zaehler fuer Virenkettebewegung
-zaehler = 0
 
 # Hauptvirus Dictionary
 eigenschaftenHauptvirus = {
@@ -77,47 +77,52 @@ for Bild in virusBilderold:
     Bild = pygame.transform.scale(Bild, (50, 50))
     virusBilder.append(Bild)
 
+#Spielgeschwindigkeit
+geschwindigkeit = 0.5
+
 # Kollisionspruefung
-def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePositionY, virenKetteZustand, eigenschaftenHauptvirus, zustand, virenKetteBild):
-    if not (hauptVirus["PositionX"] >= kleinVirus["PositionX"]+50 or hauptVirus["PositionX"] <= kleinVirus["PositionX"] - 50) and not (hauptVirus["PositionY"] >= kleinVirus["PositionY"]+50 or hauptVirus["PositionY"] <= kleinVirus["PositionY"] - 50):
-        hauptVirus["Laenge"] += 1
+def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePositionY, virenKetteZustand, zustand, virenKetteBild):
+    if not (hauptVirus["PositionX"] >= kleinVirus["PositionX"]+50 or hauptVirus["PositionX"] <= kleinVirus["PositionX"]-50) and not (hauptVirus["PositionY"] >= kleinVirus["PositionY"]+50 or hauptVirus["PositionY"] <= kleinVirus["PositionY"]-50):
+
         kleinVirus["Zaehler"] = 1999
         if len(virenKettePositionX) == 0:
             if zustand == "Links":
-                virenKettePositionX.append(eigenschaftenHauptvirus["PositionX"]+50)
-                virenKettePositionY.append(eigenschaftenHauptvirus["PositionY"])
+                virenKettePositionX.append(hauptVirus["PositionX"]+50)
+                virenKettePositionY.append(hauptVirus["PositionY"])
                 virenKetteZustand.append("Links")
             elif zustand == "Rechts":
-                virenKettePositionX.append(eigenschaftenHauptvirus["PositionX"]-50)
-                virenKettePositionY.append(eigenschaftenHauptvirus["PositionY"])
+                virenKettePositionX.append(hauptVirus["PositionX"]-50)
+                virenKettePositionY.append(hauptVirus["PositionY"])
                 virenKetteZustand.append("Rechts")
             elif zustand == "Oben":
-                virenKettePositionX.append(eigenschaftenHauptvirus["PositionX"])
-                virenKettePositionY.append(eigenschaftenHauptvirus["PositionY"]+50)
+                virenKettePositionX.append(hauptVirus["PositionX"])
+                virenKettePositionY.append(hauptVirus["PositionY"]+50)
                 virenKetteZustand.append("Oben")
             elif zustand == "Unten":
-                virenKettePositionX.append(eigenschaftenHauptvirus["PositionX"])
-                virenKettePositionY.append(eigenschaftenHauptvirus["PositionY"]-50)
+                virenKettePositionX.append(hauptVirus["PositionX"])
+                virenKettePositionY.append(hauptVirus["PositionY"]-50)
                 virenKetteZustand.append("Unten")
         else:
             if virenKetteZustand[len(virenKetteZustand)-1] == "Links":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX)-1]+50)
                 virenKettePositionY.append(virenKettePositionY[len(virenKettePositionY)-1])
-                virenKetteZustand.append("Links")
+                #virenKetteZustand.append("Links")
             elif virenKetteZustand[len(virenKetteZustand)-1] == "Rechts":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX) - 1] - 50)
                 virenKettePositionY.append(virenKettePositionY[len(virenKettePositionY) - 1])
-                virenKetteZustand.append("Rechts")
+                #virenKetteZustand.append("Rechts")
             elif virenKetteZustand[len(virenKetteZustand)-1] == "Oben":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX) - 1])
                 virenKettePositionY.append(virenKettePositionY[len(virenKettePositionY) - 1] + 50)
-                virenKetteZustand.append("Oben")
+                #virenKetteZustand.append("Oben")
             elif virenKetteZustand[len(virenKetteZustand)-1] == "Unten":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX) - 1])
                 virenKettePositionY.append(virenKettePositionY[len(virenKettePositionY) - 1] - 50)
-                virenKetteZustand.append("Unten")
+                #virenKetteZustand.append("Unten")
+            virenKetteZustand.append(zustandsspeicherViruskette[hauptVirus["Laenge"] - 1][99])
         virenKetteBild.append(kleinVirus["Bild"])
         zustandsspeicherViruskette[hauptVirus["Laenge"]] = []
+        hauptVirus["Laenge"] += 1
 
 # Funktion um kleine Viren zu erstellen
 def kleineViren(x, y, dictionary, zustand, viren):
@@ -151,28 +156,28 @@ while spielaktiv:
 
     if zustand == zustandsliste[0]:
         if eigenschaftenHauptvirus["PositionY"] != 0:
-            eigenschaftenHauptvirus["PositionY"] -=0.5
+            eigenschaftenHauptvirus["PositionY"] -= geschwindigkeit
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
 
     elif zustand == zustandsliste[1]:
         if eigenschaftenHauptvirus["PositionY"] != 750: # 50 abziehen, wegen Objektlaenge
-            eigenschaftenHauptvirus["PositionY"] +=0.5
+            eigenschaftenHauptvirus["PositionY"] += geschwindigkeit
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
 
     elif zustand == zustandsliste[2]:
         if eigenschaftenHauptvirus["PositionX"] != 0:
-            eigenschaftenHauptvirus["PositionX"] -=0.5
+            eigenschaftenHauptvirus["PositionX"] -= geschwindigkeit
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
 
     elif zustand == zustandsliste[3]:
         if eigenschaftenHauptvirus["PositionX"] != 1150: # 50 abziehen, wegen Objektlaenge
-            eigenschaftenHauptvirus["PositionX"] +=0.5
+            eigenschaftenHauptvirus["PositionX"] += geschwindigkeit
         else:
             zustand = zustandsliste[5]
             print(zustandsliste[5])
@@ -190,22 +195,22 @@ while spielaktiv:
     for anzahlVirus in virenKettePositionX:
         if virenIndex == 0:
             if zustandsspeicherHauptvirus[99] == "Oben":
-                virenKettePositionY[virenIndex] -= 0.5
+                virenKettePositionY[virenIndex] -= geschwindigkeit
             elif zustandsspeicherHauptvirus[99] == "Unten":
-                virenKettePositionY[virenIndex] += 0.5
+                virenKettePositionY[virenIndex] += geschwindigkeit
             elif zustandsspeicherHauptvirus[99] == "Links":
-                virenKettePositionX[virenIndex] -= 0.5
+                virenKettePositionX[virenIndex] -= geschwindigkeit
             elif zustandsspeicherHauptvirus[99] == "Rechts":
-                virenKettePositionX[virenIndex] += 0.5
+                virenKettePositionX[virenIndex] += geschwindigkeit
         else:
-            if zustandsspeicherViruskette[virenIndex] == "Oben":
-                virenKettePositionY[virenIndex] -= 0.5
-            elif zustandsspeicherViruskette[virenIndex] == "Unten":
-                virenKettePositionY[virenIndex] += 0.5
-            elif zustandsspeicherViruskette[virenIndex] == "Links":
-                virenKettePositionX[virenIndex] -= 0.5
-            elif zustandsspeicherViruskette[virenIndex] == "Rechts":
-                virenKettePositionX[virenIndex] += 0.5
+            if virenKetteZustand[virenIndex] == "Oben":
+                virenKettePositionY[virenIndex] -= geschwindigkeit
+            elif virenKetteZustand[virenIndex] == "Unten":
+                virenKettePositionY[virenIndex] += geschwindigkeit
+            elif virenKetteZustand[virenIndex] == "Links":
+                virenKettePositionX[virenIndex] -= geschwindigkeit
+            elif virenKetteZustand[virenIndex] == "Rechts":
+                virenKettePositionX[virenIndex] += geschwindigkeit
         virenIndex += 1
 
 # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
@@ -215,7 +220,7 @@ while spielaktiv:
             # Spiel wird beendet!
             spielaktiv=False
 
-# Aktualisieren des Zustands
+# Aktualisieren des Zustands vom Hauptvirus
     if pygame.key.get_pressed()[pygame.locals.K_LEFT]:
         if (zustand != zustandsliste[3]) or eigenschaftenHauptvirus["Laenge"] == 0:
             zustand = zustandsliste[2]
@@ -228,24 +233,35 @@ while spielaktiv:
     if pygame.key.get_pressed()[pygame.locals.K_DOWN]:
         if (zustand != zustandsliste[0]) or eigenschaftenHauptvirus["Laenge"] == 0:
             zustand = zustandsliste[1]
+
 # Zustandsspeicher vom Hauptvirus aktualisieren
     zustandsspeicherHauptvirus.insert(0, zustand)
     if len(zustandsspeicherHauptvirus) == 101:
         zustandsspeicherHauptvirus.pop()
 
 # Zustandsspeicher von kleine Viren aktualisieren
-    for virusnummer in zustandsspeicherViruskette:
-        zustandsspeicherViruskette[virusnummer].insert(0, virenKetteZustand[virusnummer-1])
-        if len(zustandsspeicherViruskette[virusnummer]) == 101:
-            zustandsspeicherViruskette[virusnummer].pop()
+    if len(virenKetteZustand) >= 1:
+        for virusnummer in zustandsspeicherViruskette:
+            zustandsspeicherViruskette[virusnummer].insert(0, virenKetteZustand[virusnummer])
+            if len(zustandsspeicherViruskette[virusnummer]) == 101:
+                zustandsspeicherViruskette[virusnummer].pop()
+
+# Aktualisieren des Zustands von der Viruskette
+    listenIndex = 0
+    for virusnummer in virenKetteZustand:
+        if listenIndex == 0:
+            virenKetteZustand[listenIndex] = zustandsspeicherHauptvirus[99]
+        else:
+            virenKetteZustand[listenIndex] = zustandsspeicherViruskette[listenIndex-1][99]
+        listenIndex += 1
 
 # Spiellogik hier integrieren
 
     eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus, zustand, virusBilder)
 
-    collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKettePositionX, virenKettePositionY, virenKetteZustand, eigenschaftenHauptvirus, zustand, virenKetteBild)
+    collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKettePositionX, virenKettePositionY, virenKetteZustand, zustand, virenKetteBild)
 
-# Spielfeld/figur(en) zeichnen (davor Spielfeld löschen)
+    # Spielfeld/figur(en) zeichnen (davor Spielfeld löschen)
     screen.fill((0, 0, 0))  # Black R,G,B
     if zustand != "Nichts" and zustand != "Gameover":
         screen.blit(eigenschaftenKleinVirus["Bild"], (eigenschaftenKleinVirus["PositionX"], eigenschaftenKleinVirus["PositionY"]))
@@ -261,6 +277,6 @@ while spielaktiv:
     pygame.display.flip()
 
 # Refresh-Zeiten festlegen
-    clock.tick(110)
+    clock.tick(geschwindigkeit+100)
 
 pygame.quit()

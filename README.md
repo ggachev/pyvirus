@@ -17,3 +17,5 @@ Verlauf:
 03.12.2020 - Kleine Viren können angehängt werden, diese können sich aber noch nicht bewegen
 
 04.12.2020 - kleine Viren bewegen sich mit dem Hauptvirus
+
+08.12.2020 - Geschwindigkeiten wurden eingefuegt, leider bewegt sich die Kette danach nicht wie gewollt

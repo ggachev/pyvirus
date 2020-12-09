@@ -19,3 +19,5 @@ Verlauf:
 04.12.2020 - kleine Viren bewegen sich mit dem Hauptvirus
 
 08.12.2020 - Geschwindigkeiten wurden eingefuegt, leider bewegt sich die Kette danach nicht wie gewollt
+
+09.12.2020 - Viruskette bewegt sich korrekt, Geschwindigkeiten funktionieren

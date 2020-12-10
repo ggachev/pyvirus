@@ -1,5 +1,5 @@
 # Pygame Beispiel
-import os, sys, pygame, pygame.locals, random
+import os, sys, pygame, pygame.locals, random, time
 #import /Projekt/kleineViren
 
 # Initialisieren von PyGame
@@ -78,7 +78,7 @@ for Bild in virusBilderold:
     virusBilder.append(Bild)
 
 #Spielgeschwindigkeit
-geschwindigkeit = 2
+geschwindigkeit = 4
 pixelaenderung = geschwindigkeit/2
 zustandsanzahl = int((100 / geschwindigkeit) - 1)
 
@@ -153,16 +153,19 @@ while spielaktiv:
 
     # Aktualisieren des Zustands vom Hauptvirus
     if pygame.key.get_pressed()[pygame.locals.K_LEFT]:
-        if (zustand != zustandsliste[3]) or eigenschaftenHauptvirus["Laenge"] == 0:
+        if eigenschaftenHauptvirus["Laenge"] == 0 and zustand != zustandsliste[5]:
             zustand = zustandsliste[2]
+        else:
+            if virenKetteZustand[0] != zustandsliste[3]:
+                zustand = zustandsliste[2]
     if pygame.key.get_pressed()[pygame.locals.K_RIGHT]:
-        if (zustand != zustandsliste[2]) or eigenschaftenHauptvirus["Laenge"] == 0:
+        if ((zustand != zustandsliste[2]) or eigenschaftenHauptvirus["Laenge"] == 0) and zustand != zustandsliste[5]:
             zustand = zustandsliste[3]
     if pygame.key.get_pressed()[pygame.locals.K_UP]:
-        if (zustand != zustandsliste[1]) or eigenschaftenHauptvirus["Laenge"] == 0:
+        if ((zustand != zustandsliste[1]) or eigenschaftenHauptvirus["Laenge"] == 0) and zustand != zustandsliste[5]:
             zustand = zustandsliste[0]
     if pygame.key.get_pressed()[pygame.locals.K_DOWN]:
-        if (zustand != zustandsliste[0]) or eigenschaftenHauptvirus["Laenge"] == 0:
+        if ((zustand != zustandsliste[0]) or eigenschaftenHauptvirus["Laenge"] == 0) and zustand != zustandsliste[5]:
             zustand = zustandsliste[1]
 
     # Zustandsspeicher vom Hauptvirus aktualisieren
@@ -182,30 +185,32 @@ while spielaktiv:
             eigenschaftenHauptvirus["PositionY"] -= pixelaenderung
         else:
             zustand = zustandsliste[5]
-            print(zustandsliste[5])
+            print(zustand)
 
     elif zustand == zustandsliste[1]:
         if eigenschaftenHauptvirus["PositionY"] < 750: # 50 abziehen, wegen Objektlaenge
             eigenschaftenHauptvirus["PositionY"] += pixelaenderung
         else:
             zustand = zustandsliste[5]
-            print(zustandsliste[5])
+            print(zustand)
 
     elif zustand == zustandsliste[2]:
         if eigenschaftenHauptvirus["PositionX"] > 0:
             eigenschaftenHauptvirus["PositionX"] -= pixelaenderung
         else:
             zustand = zustandsliste[5]
-            print(zustandsliste[5])
+            print(zustand)
 
     elif zustand == zustandsliste[3]:
         if eigenschaftenHauptvirus["PositionX"] < 1150: # 50 abziehen, wegen Objektlaenge
             eigenschaftenHauptvirus["PositionX"] += pixelaenderung
         else:
             zustand = zustandsliste[5]
-            print(zustandsliste[5])
+            print(zustand)
+
     # Zuruecksetzen der Zustand, wenn der Rand getroffen wurde
     elif zustand == zustandsliste[5]:
+        zustand = zustandsliste[4]
         eigenschaftenHauptvirus["PositionX"] = 600
         eigenschaftenHauptvirus["PositionY"] = 400
         eigenschaftenHauptvirus["Laenge"] = 0
@@ -215,9 +220,22 @@ while spielaktiv:
         virenKetteBild = []
         zustandsspeicherViruskette = {}
         zustandsspeicherHauptvirus = []
+        #Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
+        time.sleep(1)
+
+#Kollisionspruefung mit sich selbst
+#
+    listenIndex = 0
+    for position in virenKettePositionX:
+        if listenIndex >= 1 and zustand != zustandsliste[5]:
+            if not (eigenschaftenHauptvirus["PositionX"] >= virenKettePositionX[listenIndex] + 50 or eigenschaftenHauptvirus["PositionX"] <= virenKettePositionX[listenIndex] - 50) and not (eigenschaftenHauptvirus["PositionY"] >= virenKettePositionY[listenIndex] + 50 or eigenschaftenHauptvirus["PositionY"] <= virenKettePositionY[listenIndex] - 50):
+                zustand = zustandsliste[5]
+                print(zustand)
+        listenIndex += 1
+
+
 
     # Spiellogik hier integrieren
-
     eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus, zustand, virusBilder)
 
     collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKettePositionX, virenKettePositionY, virenKetteZustand, zustand, virenKetteBild, zustandsanzahl)

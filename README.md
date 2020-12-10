@@ -21,3 +21,5 @@ Verlauf:
 08.12.2020 - Geschwindigkeiten wurden eingefuegt, leider bewegt sich die Kette danach nicht wie gewollt
 
 09.12.2020 - Viruskette bewegt sich korrekt, Geschwindigkeiten funktionieren
+
+10.12.2020 - Funktion fuer Kollisionspruefung mit sich selbst eingebaut; Sleep von einer Sekunde nach Gameover eingebaut

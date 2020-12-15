@@ -25,3 +25,5 @@ Verlauf:
 10.12.2020 - Funktion fuer Kollisionspruefung mit sich selbst eingebaut; Sleep von einer Sekunde nach Gameover eingebaut
 
 11.12.2020 - Kommentierung und kleine Bugs beseitigen
+
+15.12.2020 - Liste für Virenkette in ein Dictionary umgewandelt +Score datei hinzugefügt

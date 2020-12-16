@@ -63,14 +63,15 @@ virenKette = {
     "virenKettePositionY": [],
 # aktuelle Zustand
     "virenKetteZustand": [],
-    "virenKetteBild": []
-
+    "virenKetteBild": [],
+    "virenKetteBildRichtung": []
 }
 
 # Virus Bilder - Idee von https://pythonprogramming.net/displaying-images-pygame/
 hauptVirus = pygame.image.load('rsz_kleineviren1.png')
 # Bild verkleinern https://stackoverflow.com/questions/43046376/how-to-change-an-image-size-in-pygame/43053791
 hauptVirus = pygame.transform.scale(hauptVirus, (50, 50))
+hauptVirusRichtung = 0
 
 virusRot = pygame.image.load('rsz_kleineviren2.png')
 virusOrange = pygame.image.load('rsz_kleineviren3.png')
@@ -147,30 +148,38 @@ def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePos
 # Funktion fuer kleine Viren
 # es wird eine zufaellige Postion(X, Y) und ein zufaelliges Bild ermittelt
 # Die Position von dem kleinen Virus wird alle 2000 Durchlaeufe neu berechnet
-def kleineViren(x, y, dictionary, zustand, viren):
-    z = dictionary["Zaehler"]
-    if zustand != "Nichts" and zustand != "Gameover":
-        z += 1
-        if z == 2000:
+def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
+    z = eigenschaftenKleinVirus["Zaehler"]
+    z += 1
+    if z == 2000:
 
-            randomvirus = random.randrange(0, 7)
-            randomvirus = viren[randomvirus]
-            dictionary["Bild"] = randomvirus
+        randomvirus = random.randrange(0, 7)
+        randomvirus = virusBilder[randomvirus]
+        eigenschaftenKleinVirus["Bild"] = randomvirus
 
+        randomx = random.randrange(0, 1150)
+        randomy = random.randrange(0, 750)
+
+        while not (randomx >= x+200 or randomx <= x-150):
             randomx = random.randrange(0, 1150)
+
+        while not (randomy >= y+200 or randomy <= y-150):
             randomy = random.randrange(0, 750)
 
-            while not (randomx >= x+100 or randomx <= x-100):
+        listenIndex = 0
+        for Position in virenKette["virenKettePositionX"]:
+            while not (randomx > virenKette["virenKettePositionX"][listenIndex] + 50 or randomx < virenKette["virenKettePositionX"][listenIndex]):
                 randomx = random.randrange(0, 1150)
-            dictionary["PositionX"] = randomx
-
-            while not (randomy >= y+100 or randomy <= y-100):
+            while not (randomy > virenKette["virenKettePositionY"][listenIndex] + 50 or randomy < virenKette["virenKettePositionY"][listenIndex]):
                 randomy = random.randrange(0, 750)
-            dictionary["PositionY"] = randomy
-            z = 0
+            listenIndex += 1
+        eigenschaftenKleinVirus["PositionX"] = randomx
+        eigenschaftenKleinVirus["PositionY"] = randomy
 
-        dictionary["Zaehler"] = z
-    return dictionary
+        z = 0
+
+    eigenschaftenKleinVirus["Zaehler"] = z
+    return eigenschaftenKleinVirus
 
 # Schleife Hauptprogramm
 while spielaktiv:
@@ -270,9 +279,10 @@ while spielaktiv:
 
 
 # Spiellogik ist hier integriert
-    eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus, zustand, virusBilder)
+    if zustand != "Nichts" and zustand != "Gameover":
+        eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus, virusBilder, virenKette)
 
-    collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette["virenKettePositionX"], virenKette["virenKettePositionY"], virenKette["virenKetteZustand"], zustand, virenKette["virenKetteBild"], zustandsanzahl)
+        collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette["virenKettePositionX"], virenKette["virenKettePositionY"], virenKette["virenKetteZustand"], zustand, virenKette["virenKetteBild"], zustandsanzahl)
 
 # Zustandsspeicher von Virenkette aktualisieren
 # Wird nur gemacht, wenn mindestens 1 Virus angehaengt ist
@@ -335,12 +345,31 @@ while spielaktiv:
     if zustand != "Nichts" and zustand != "Gameover":
         screen.blit(eigenschaftenKleinVirus["Bild"], (eigenschaftenKleinVirus["PositionX"], eigenschaftenKleinVirus["PositionY"]))
 # Hauptvirus zeichnen
-    screen.blit(hauptVirus, (eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"]))
+# Umdrehen Idee von: https://www.pygame.org/docs/ref/transform.html#pygame.transform.rotate
+    if zustand == "Oben":
+        hauptVirusRichtung = pygame.transform.rotate(hauptVirus, 180)
+    elif zustand == "Links":
+        hauptVirusRichtung = pygame.transform.rotate(hauptVirus, 270)
+    elif zustand == "Rechts":
+        hauptVirusRichtung = pygame.transform.rotate(hauptVirus, 90)
+    else:
+        hauptVirusRichtung = hauptVirus
+    screen.blit(hauptVirusRichtung, (eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"]))
+
 # Virenkette zeichnen
     virenIndex = 0
     for anzahlVirus in virenKette["virenKettePositionX"]:
-        screen.blit(virenKette["virenKetteBild"][virenIndex], (virenKette["virenKettePositionX"][virenIndex], virenKette["virenKettePositionY"][virenIndex]))
+        if virenKette["virenKetteZustand"][virenIndex] == "Oben":
+            virenKette["virenKetteBildRichtung"].append(pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 180))
+        elif virenKette["virenKetteZustand"][virenIndex] == "Links":
+            virenKette["virenKetteBildRichtung"].append(pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 270))
+        elif virenKette["virenKetteZustand"][virenIndex] == "Rechts":
+            virenKette["virenKetteBildRichtung"].append(pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 90))
+        else:
+            virenKette["virenKetteBildRichtung"].append(virenKette["virenKetteBild"][virenIndex])
+        screen.blit(virenKette["virenKetteBildRichtung"][virenIndex], (virenKette["virenKettePositionX"][virenIndex], virenKette["virenKettePositionY"][virenIndex]))
         virenIndex += 1
+    virenKette["virenKetteBildRichtung"] = []
 
 # Fenster aktualisieren
     pygame.display.flip()

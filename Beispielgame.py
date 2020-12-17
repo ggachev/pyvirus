@@ -3,8 +3,12 @@ import pygame.locals
 import random
 import time
 
-# Initialisieren von PyGame
+# Initialisieren von PyGame und Schrift
 pygame.init()
+
+#Schriftart festlegen
+#https://www.wfonts.com/font/comic-sans-ms
+schriftart = pygame.font.Font("comici.ttf", 30)
 
 # Fenster öffnen
 screenBreite = 1200
@@ -49,7 +53,7 @@ eigenschaftenKleinVirus = {
 
 #Der Score wird aus einer Textdatei gelesen
 scoreDatei = open("Score.txt")
-score = scoreDatei.readline()
+highscore = scoreDatei.readline()
 scoreDatei.close()
 
 # Dictionary mit den letzten 100 Zustaenden fuer Virenkette
@@ -95,7 +99,7 @@ for Bild in virusBilderold:
 # Pixelaenderung bestimmt den Wert um wie viele Pixel sich der Virus bewegen soll und das ist abhaengig von der Geschwindigkeit
 # Die Geschwindigkeit soll immer ein Teiler von 100 ohne Rest sein
 # zustandsanzahl berechnet wie viele Zustaende bei unterschiedlicher Geschwindigkeit betrachtet werden muessen und gibt das Ergebniss als Integer aus
-geschwindigkeit = 4
+geschwindigkeit = 1
 pixelaenderung = geschwindigkeit/2
 zustandsanzahl = int((100 / geschwindigkeit) - 1)
 
@@ -157,21 +161,19 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
         randomvirus = virusBilder[randomvirus]
         eigenschaftenKleinVirus["Bild"] = randomvirus
 
-        randomx = random.randrange(0, 1150)
-        randomy = random.randrange(0, 750)
+        position = False
 
-        while not (randomx >= x+200 or randomx <= x-150):
+        while not position:
+            position = True
             randomx = random.randrange(0, 1150)
-
-        while not (randomy >= y+200 or randomy <= y-150):
             randomy = random.randrange(0, 750)
 
-        listenIndex = 0
-        for Position in virenKette["virenKettePositionX"]:
-            while not (randomx > virenKette["virenKettePositionX"][listenIndex] + 50 or randomx < virenKette["virenKettePositionX"][listenIndex]):
-                randomx = random.randrange(0, 1150)
-            while not (randomy > virenKette["virenKettePositionY"][listenIndex] + 50 or randomy < virenKette["virenKettePositionY"][listenIndex]):
-                randomy = random.randrange(0, 750)
+            if not ((randomx >= x + 200 or randomx <= x - 200) and (randomy >= y + 200 or randomy <= y - 200)):
+                position = False
+            listenIndex = 0
+            for Position in virenKette["virenKettePositionX"]:
+                if ((randomx <= virenKette["virenKettePositionX"][listenIndex] + 50 and randomx >= virenKette["virenKettePositionX"][listenIndex] - 50) and (randomy <= virenKette["virenKettePositionY"][listenIndex] + 50 and randomy >= virenKette["virenKettePositionY"][listenIndex] - 50)):
+                    position = False
             listenIndex += 1
         eigenschaftenKleinVirus["PositionX"] = randomx
         eigenschaftenKleinVirus["PositionY"] = randomy
@@ -180,6 +182,21 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
 
     eigenschaftenKleinVirus["Zaehler"] = z
     return eigenschaftenKleinVirus
+#1, 2, 2.5, 4, 5, 10
+# 384
+def geschwindigkeitAnpassung(eigenschaftenHauptvirus, geschwindigkeit):
+    if eigenschaftenHauptvirus["Laenge"] >= 1 and eigenschaftenHauptvirus["Laenge"] < 5:
+        geschwindigkeit = 2
+    elif eigenschaftenHauptvirus["Laenge"] >= 5  and eigenschaftenHauptvirus["Laenge"] < 10:
+        geschwindigkeit = 2.5
+    elif eigenschaftenHauptvirus["Laenge"] >= 10  and eigenschaftenHauptvirus["Laenge"] < 50:
+        geschwindigkeit = 4
+    elif eigenschaftenHauptvirus["Laenge"] >= 50  and eigenschaftenHauptvirus["Laenge"] < 100:
+        geschwindigkeit = 5
+    elif eigenschaftenHauptvirus["Laenge"] >= 100:
+        geschwindigkeit = 10
+
+    return geschwindigkeit
 
 # Schleife Hauptprogramm
 while spielaktiv:
@@ -263,6 +280,7 @@ while spielaktiv:
         virenKette["virenKetteBild"] = []
         zustandsspeicherViruskette = {}
         zustandsspeicherHauptvirus = []
+        geschwindigkeit = 1
 # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
         time.sleep(1)
 
@@ -283,6 +301,10 @@ while spielaktiv:
         eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus, virusBilder, virenKette)
 
         collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette["virenKettePositionX"], virenKette["virenKettePositionY"], virenKette["virenKetteZustand"], zustand, virenKette["virenKetteBild"], zustandsanzahl)
+
+        geschwindigkeit = geschwindigkeitAnpassung(eigenschaftenHauptvirus, geschwindigkeit)
+        pixelaenderung = geschwindigkeit / 2
+        zustandsanzahl = int((100 / geschwindigkeit) - 1)
 
 # Zustandsspeicher von Virenkette aktualisieren
 # Wird nur gemacht, wenn mindestens 1 Virus angehaengt ist
@@ -370,6 +392,12 @@ while spielaktiv:
         screen.blit(virenKette["virenKetteBildRichtung"][virenIndex], (virenKette["virenKettePositionX"][virenIndex], virenKette["virenKettePositionY"][virenIndex]))
         virenIndex += 1
     virenKette["virenKetteBildRichtung"] = []
+
+#Textfeld zeichnen
+    textfeldLaenge = schriftart.render('Laenge: ' + str(eigenschaftenHauptvirus["Laenge"]), False, (255, 255, 255))
+    textfeldHighscore = schriftart.render('Highscore: ' + highscore, False, (255, 255, 255))
+    screen.blit(textfeldLaenge, (10, 0))
+    screen.blit(textfeldHighscore, (980, 0))
 
 # Fenster aktualisieren
     pygame.display.flip()

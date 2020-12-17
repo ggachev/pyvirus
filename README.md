@@ -29,3 +29,5 @@ Verlauf:
 15.12.2020 - Liste für Virenkette in ein Dictionary umgewandelt +Score datei hinzugefügt
 
 16.12.2020 - Viren drehen sich anhand der Richtung um; kleine Viren werden nicht mehr unter der Virenkette gespawned(Funktion kleineViren erweitert)
+
+17.12.2020 - Funktion kleineViren angepasst nach der Erweiterung; Textfelder hinzugefuegt

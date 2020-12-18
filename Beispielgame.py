@@ -103,6 +103,8 @@ geschwindigkeit = 1
 pixelaenderung = geschwindigkeit/2
 zustandsanzahl = int((100 / geschwindigkeit) - 1)
 
+geschwindigkeitszaehler = 0
+
 # Kollisionspruefung
 # Zunaechst wird geprueft ob eine Kollision mit einem kleinen Virus stattfindet, wenn das der Fall ist wird berechnet an
 # welcher Position der Virus angehaengt wird und in welche Richtung er sich bewegen soll
@@ -184,16 +186,36 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
     return eigenschaftenKleinVirus
 #1, 2, 2.5, 4, 5, 10
 # 384
-def geschwindigkeitAnpassung(eigenschaftenHauptvirus, geschwindigkeit):
-    if eigenschaftenHauptvirus["Laenge"] >= 1 and eigenschaftenHauptvirus["Laenge"] < 5:
+def geschwindigkeitAnpassung(eigenschaftenHauptvirus, geschwindigkeit, geschwindigkeitszaehler, zustandsspeicherHauptvirus):
+    if eigenschaftenHauptvirus["Laenge"] == 1 and geschwindigkeitszaehler == 0:
         geschwindigkeit = 2
-    elif eigenschaftenHauptvirus["Laenge"] >= 5  and eigenschaftenHauptvirus["Laenge"] < 10:
+        geschwindigkeitszaehler += 1
+        for virus in zustandsspeicherViruskette:
+            listenIndex = 0
+            for zustandvirus in zustandsspeicherViruskette[virus]:
+                if listenIndex % 2 == 0:
+                    zustandsspeicherViruskette[virus].pop(listenIndex)
+                listenIndex += 1
+            for zustandvirus in zustandsspeicherViruskette[virus]:
+                zustandsspeicherViruskette[virus].append("Etwas")
+            print(zustandsspeicherViruskette)
+        listenIndex = 0
+        for zustandvirus in zustandsspeicherHauptvirus:
+            if listenIndex % 2 == 0:
+                zustandsspeicherHauptvirus.pop(listenIndex)
+            listenIndex += 1
+        for zustandvirus in zustandsspeicherHauptvirus:
+            zustandsspeicherHauptvirus.append("Etwas")
+
+        print(zustandsspeicherHauptvirus)
+
+    elif eigenschaftenHauptvirus["Laenge"] == 5:
         geschwindigkeit = 2.5
-    elif eigenschaftenHauptvirus["Laenge"] >= 10  and eigenschaftenHauptvirus["Laenge"] < 50:
+    elif eigenschaftenHauptvirus["Laenge"] == 10:
         geschwindigkeit = 4
-    elif eigenschaftenHauptvirus["Laenge"] >= 50  and eigenschaftenHauptvirus["Laenge"] < 100:
+    elif eigenschaftenHauptvirus["Laenge"] == 50:
         geschwindigkeit = 5
-    elif eigenschaftenHauptvirus["Laenge"] >= 100:
+    elif eigenschaftenHauptvirus["Laenge"] == 100:
         geschwindigkeit = 10
 
     return geschwindigkeit
@@ -302,7 +324,7 @@ while spielaktiv:
 
         collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette["virenKettePositionX"], virenKette["virenKettePositionY"], virenKette["virenKetteZustand"], zustand, virenKette["virenKetteBild"], zustandsanzahl)
 
-        geschwindigkeit = geschwindigkeitAnpassung(eigenschaftenHauptvirus, geschwindigkeit)
+        geschwindigkeit = geschwindigkeitAnpassung(eigenschaftenHauptvirus, geschwindigkeit, geschwindigkeitszaehler, zustandsspeicherHauptvirus)
         pixelaenderung = geschwindigkeit / 2
         zustandsanzahl = int((100 / geschwindigkeit) - 1)
 

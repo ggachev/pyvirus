@@ -31,3 +31,5 @@ Verlauf:
 16.12.2020 - Viren drehen sich anhand der Richtung um; kleine Viren werden nicht mehr unter der Virenkette gespawned(Funktion kleineViren erweitert)
 
 17.12.2020 - Funktion kleineViren angepasst nach der Erweiterung; Textfelder hinzugefuegt
+
+18.12.2020 - Versuch die Geschwindigkeitsanpassung zu optimieren; leider besteht das Problem immernoch, dass bei Aenderung der Geschwindigkeit manchmal sich die kleine Viren nicht an die Richtige Postition spawnen bzw. nicht in die richtige Richtung fuer X Schritte laufen

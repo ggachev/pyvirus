@@ -1,18 +1,20 @@
 # Pygame Bibliotheken importieren
-import pygame.locals
 import random
 import time
+import pygame.locals
+# Um pygame menu zu installieren: python -m pip install pygame-menu
+import pygame_menu
 
 # Initialisieren von PyGame und Schrift
 pygame.init()
 
-#Schriftart festlegen
-#https://www.wfonts.com/font/comic-sans-ms
+# Schriftart festlegen
+# https://www.wfonts.com/font/comic-sans-ms
 schriftart = pygame.font.Font("comici.ttf", 30)
 
 # Fenster öffnen
-screenBreite = 1200
-screenHoehe = 800
+screenBreite = 1212
+screenHoehe = 812
 
 screen = pygame.display.set_mode((screenBreite, screenHoehe))
 
@@ -33,14 +35,11 @@ zustand = zustandsliste[4]
 # Hauptvirus Dictionary
 # enthaelt die Postionen X und Y vom Hauptvirus sowie die Laenge
 eigenschaftenHauptvirus = {
-    "PositionX": 600,
-    "PositionY": 400,
-    "Laenge": 0
+    "PositionX": 606,
+    "PositionY": 406,
+    "Laenge": 0,
+    "NaechsterZustand": "Nichts"
 }
-
-# Liste mit den letzten 100 Zustaende vom Hauptvirus
-# dort wird der aktuelle Zustand an der ersten Position hinzugefuegt
-zustandsspeicherHauptvirus = []
 
 # Dictionary fuer die Viren, die gespawned werden
 # enthaelt die Positionen X und Y, Zaehler und das Bild
@@ -51,24 +50,21 @@ eigenschaftenKleinVirus = {
     "Bild": 0
 }
 
-#Der Score wird aus einer Textdatei gelesen
+# Der Score wird aus einer Textdatei gelesen
 scoreDatei = open("Score.txt")
 highscore = scoreDatei.readline()
 scoreDatei.close()
-
-# Dictionary mit den letzten 100 Zustaenden fuer Virenkette
-# Dictionary wird gebraucht, um Zustandslisten fuer jeden angehaengten Virus zu speichern
-zustandsspeicherViruskette = {}
 
 # Dictionary fuer Virenkette
 # An jeweils der erste Stelle stehen die Elemente, die zu dem ersten Virus der Kette gehoeren, an der zweiten die vom zweiten...
 virenKette = {
     "virenKettePositionX": [],
     "virenKettePositionY": [],
-# aktuelle Zustand
+    # aktuelle Zustand
     "virenKetteZustand": [],
     "virenKetteBild": [],
-    "virenKetteBildRichtung": []
+    "virenKetteBildRichtung": [],
+    "NaechsterZustand" : []
 }
 
 # Virus Bilder - Idee von https://pythonprogramming.net/displaying-images-pygame/
@@ -95,20 +91,83 @@ for Bild in virusBilderold:
     Bild = pygame.transform.scale(Bild, (50, 50))
     virusBilder.append(Bild)
 
+# Bilder Zusatzobjkte (Maske/ Spritze) 27.12.20
+# https://icon-icons.com/de/symbol/virus-covid19-corona-Maske-Gesicht/141777
+Maske = pygame.image.load('Maske.png')
+Maske = pygame.transform.scale(Maske, (50, 50))
+
+# Variable fuer Maske
+maskeAktiv = False
+
+# Variable fuer Impfung
+spritzeAktiv = False
+
+# https://icons8.de/icon/52583/spritze
+Spritze = pygame.image.load('Spritze.png')
+Spritze = pygame.transform.scale(Spritze, (50, 50))
+
+# Dictionary fuer die Maske, die gespawned wird
+# enthaelt die Positionen X und Y, Zaehler und das Bild
+eigenschaftenMaske = {
+    "PositionX": 0,
+    "PositionY": 0,
+    "MaskeZaehler": 4999,
+    "Bild": Maske,
+    "maskeAktivZaehler": 0
+}
+# Dictionary fuer die Spritze , die gespawned wird
+# enthaelt die Positionen X und Y, Zaehler und das Bild
+eigenschaftenSpritze = {
+    "PositionX": 0,
+    "PositionY": 0,
+    "SpritzeZaehler": 3999,
+    "Bild": Spritze
+}
+
 # Startgeschwindigkeit des Virus festlegen
 # Pixelaenderung bestimmt den Wert um wie viele Pixel sich der Virus bewegen soll und das ist abhaengig von der Geschwindigkeit
 # Die Geschwindigkeit soll immer ein Teiler von 100 ohne Rest sein
 # zustandsanzahl berechnet wie viele Zustaende bei unterschiedlicher Geschwindigkeit betrachtet werden muessen und gibt das Ergebniss als Integer aus
-geschwindigkeit = 2
-pixelaenderung = geschwindigkeit/2
-zustandsanzahl = int((100 / geschwindigkeit) - 1)
+geschwindigkeit = 4
+pixelaenderung = geschwindigkeit / 2
 
-geschwindigkeitszaehler = 0
+# Variable um den Randuebergehen zu aktivieren bzw. deaktivieren
+randaktiv = True
+
+# Menue Logik, es wurde ein Library pygame_menu benutzt
+# https://pygame-menu.readthedocs.io/en/latest/index.html
+def name_aendern(wert):
+    print(wert)
+
+def setze_schwierigkeitsgrad(wert, schwierigkeitsgrad):
+    pass
+
+def setze_rand(wert, x):
+    global randaktiv
+    if x == 1:
+        randaktiv = True
+    if x == 2:
+        randaktiv = False
+    return randaktiv
+
+def spiel_starten():
+    menu.disable()
+
+# Es wird ein Menue erstellt mit Groesse 300x600
+menu = pygame_menu.Menu(400, 600, 'Willkommen', theme=pygame_menu.themes.THEME_DARK)
+
+menu.add_text_input('Name: ', default='Max Weiss', onchange=name_aendern)
+menu.add_selector('Schwierigkeitsgrad: ', [('Leicht', 1), ('Schwer', 2)], onchange=setze_schwierigkeitsgrad)
+menu.add_selector('Randuebergang: ', [('Aktiv', 1), ('Inaktiv', 2)], onchange=setze_rand)
+menu.add_button('Spielen', spiel_starten)
+menu.add_button('Spiel beenden', pygame_menu.events.EXIT)
+# Das Menue wird hier zum Ersten mal gestartet
+menu.mainloop(screen)
 
 # Kollisionspruefung
 # Zunaechst wird geprueft ob eine Kollision mit einem kleinen Virus stattfindet, wenn das der Fall ist wird berechnet an
 # welcher Position der Virus angehaengt wird und in welche Richtung er sich bewegen soll
-def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePositionY, virenKetteZustand, zustand, virenKetteBild, zustandsanzahl):
+def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePositionY, virenKetteZustand, zustand, virenKetteBild, virenKetteNaechsterZustand):
     if not (hauptVirus["PositionX"] >= kleinVirus["PositionX"]+50 or hauptVirus["PositionX"] <= kleinVirus["PositionX"]-50) and not (hauptVirus["PositionY"] >= kleinVirus["PositionY"]+50 or hauptVirus["PositionY"] <= kleinVirus["PositionY"]-50):
 # Bei einer Kollision soll direkt eine neue Position ermittelt werden und deshalb wird der Zaehler auf 1999 gesetzt
 # Der obere Block ist fuer das Anhaengen des ersten Virus an den Hauptvirus
@@ -130,39 +189,62 @@ def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePos
                 virenKettePositionX.append(hauptVirus["PositionX"])
                 virenKettePositionY.append(hauptVirus["PositionY"]-50)
                 virenKetteZustand.append("Unten")
+            virenKetteNaechsterZustand.append(zustand)
+
 # Der untere Block ist fuer das Anhaengen der weiteren Viren an den letzten Virus der Kette
         else:
-            if zustandsspeicherViruskette[hauptVirus["Laenge"] - 1][zustandsanzahl] == "Links":
+            if virenKette["virenKetteZustand"][len(virenKette["virenKetteZustand"])-1] == "Links":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX)-1] + 50)
                 virenKettePositionY.append(virenKettePositionY[len(virenKettePositionY)-1])
-            elif zustandsspeicherViruskette[hauptVirus["Laenge"] - 1][zustandsanzahl] == "Rechts":
+            elif virenKette["virenKetteZustand"][len(virenKette["virenKetteZustand"])-1] == "Rechts":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX) - 1] - 50)
                 virenKettePositionY.append(virenKettePositionY[len(virenKettePositionY) - 1])
-            elif zustandsspeicherViruskette[hauptVirus["Laenge"] - 1][zustandsanzahl] == "Oben":
+            elif virenKette["virenKetteZustand"][len(virenKette["virenKetteZustand"])-1] == "Oben":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX) - 1])
                 virenKettePositionY.append(virenKettePositionY[len(virenKettePositionY) - 1] + 50)
-            elif zustandsspeicherViruskette[hauptVirus["Laenge"] - 1][zustandsanzahl] == "Unten":
+            elif virenKette["virenKetteZustand"][len(virenKette["virenKetteZustand"])-1] == "Unten":
                 virenKettePositionX.append(virenKettePositionX[len(virenKettePositionX) - 1])
                 virenKettePositionY.append(virenKettePositionY[len(virenKette["virenKettePositionY"]) - 1] - 50)
-            virenKetteZustand.append(zustandsspeicherViruskette[hauptVirus["Laenge"] - 1][zustandsanzahl])
+            virenKetteZustand.append(virenKetteZustand[len(virenKetteZustand) - 1])
+            virenKetteNaechsterZustand.append(virenKetteZustand[len(virenKetteZustand) - 2])
 # Das Bild von dem erstellten klein Virus wird zur Liste mit den Bildern hinzugefuegt
         virenKetteBild.append(kleinVirus["Bild"])
-# neue Liste in Dictionary der Viruskette zum Speichern der Zustaende vom neuen Virus erstellt
-        zustandsspeicherViruskette[hauptVirus["Laenge"]] = []
         hauptVirus["Laenge"] += 1
+
+# Zunaechst wird geprueft ob eine Kollision mit der Maske/ Spritze stattfindet
+def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
+    if not (hauptVirus["PositionX"] >= eigenschaftenMaske["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenMaske["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenMaske["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenMaske["PositionY"] - 50):
+        eigenschaftenMaske["MaskeZaehler"] = 0
+        maskeAktiv = True
+        eigenschaftenMaske["PositionX"] = -1
+    return maskeAktiv
+
+def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv):
+    if not (hauptVirus["PositionX"] >= eigenschaftenSpritze["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenSpritze["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenSpritze["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenSpritze["PositionY"] - 50):
+        eigenschaftenSpritze["SpritzeZaehler"] = 0
+        spritzeAktiv = True
+    return spritzeAktiv
 
 # Funktion fuer kleine Viren
 # es wird eine zufaellige Postion(X, Y) und ein zufaelliges Bild ermittelt
 # Die Position von dem kleinen Virus wird alle 2000 Durchlaeufe neu berechnet
+# Die Parameter x und y liefern die aktuelle Position von dem Hauptvirus
 def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
     z = eigenschaftenKleinVirus["Zaehler"]
     z += 1
-    if z == 2000:
 
-        randomvirus = random.randrange(0, 7)
-        randomvirus = virusBilder[randomvirus]
+    if z == 2000:
+        # Es wird geprueft, ob das Bild gleich wie das vorherige ist und wenn das der Fall ist, wird neues Bild zufaellig erstellt
+        virenbildgleich = True
+
+        while virenbildgleich:
+            randomvirus = random.randrange(0, 7)
+            randomvirus = virusBilder[randomvirus]
+            if eigenschaftenKleinVirus["Bild"] != randomvirus:
+                virenbildgleich = False
         eigenschaftenKleinVirus["Bild"] = randomvirus
 
+        # Kollisionspruefung und Erstellungs die neue Koordinaten fuer kleinVirus
         position = False
 
         while not position:
@@ -174,9 +256,12 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
                 position = False
             listenIndex = 0
             for Position in virenKette["virenKettePositionX"]:
-                if ((randomx <= virenKette["virenKettePositionX"][listenIndex] + 50 and randomx >= virenKette["virenKettePositionX"][listenIndex] - 50) and (randomy <= virenKette["virenKettePositionY"][listenIndex] + 50 and randomy >= virenKette["virenKettePositionY"][listenIndex] - 50)):
+                if ((randomx <= virenKette["virenKettePositionX"][listenIndex] + 50 and randomx >=
+                     virenKette["virenKettePositionX"][listenIndex] - 50) and (
+                        randomy <= virenKette["virenKettePositionY"][listenIndex] + 50 and randomy >=
+                        virenKette["virenKettePositionY"][listenIndex] - 50)):
                     position = False
-            listenIndex += 1
+                listenIndex += 1
         eigenschaftenKleinVirus["PositionX"] = randomx
         eigenschaftenKleinVirus["PositionY"] = randomy
 
@@ -185,172 +270,294 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
     eigenschaftenKleinVirus["Zaehler"] = z
     return eigenschaftenKleinVirus
 
+# Funktion für die Maske (Analog zu der Funktion kleineViren)
+# es wird eine zufaellige Postion(X, Y) mit dem Bild der Maske
+# Die Position der Maske wird alle 5000 Durchlaeufe neu berechnet
+def zusatzObjektMaske(eigenschaftenMaske):
+    z = eigenschaftenMaske["MaskeZaehler"]
+    z += 1
+    if z == 5000:
+        randomx = random.randrange(0, 1150)
+        randomy = random.randrange(0, 750)
+        eigenschaftenMaske["Bild"] = Maske
+        position = False
+        while not position:
+            position = True
+            randomx = random.randrange(0, 1150)
+            randomy = random.randrange(0, 750)
+        eigenschaftenMaske["PositionX"] = randomx
+        eigenschaftenMaske["PositionY"] = randomy
+        z = 0
+    eigenschaftenMaske["MaskeZaehler"] = z
+    return eigenschaftenMaske
+
+# Funktion für die Spritze (Analog zu der Funktion kleineViren)
+# es wird eine zufaellige Postion(X, Y) mit dem Bild der Spritze
+# Die Position der Spritze wird alle 4000 Durchlaeufe neu berechnet
+def zusatzObjektSpritze(eigenschaftenSpritze):
+    z = eigenschaftenSpritze["SpritzeZaehler"]
+    z += 1
+    if z == 4000:
+        randomx = random.randrange(0, 1150)
+        randomy = random.randrange(0, 750)
+        eigenschaftenSpritze["Bild"] = Spritze
+        position = False
+        while not position:
+            position = True
+            randomx = random.randrange(0, 1150)
+            randomy = random.randrange(0, 750)
+        eigenschaftenSpritze["PositionX"] = randomx
+        eigenschaftenSpritze["PositionY"] = randomy
+        z = 0
+    eigenschaftenSpritze["SpritzeZaehler"] = z
+    return eigenschaftenSpritze
+
+
 # Schleife Hauptprogramm
 while spielaktiv:
 
-# Aktualisieren des Zustands vom Hauptvirus
-# Es wird gepruft, ob der Zustand nicht Gameover ist und eine Pfeiltaste gedrueckt wird
+    # Aktualisieren des Zustands vom Hauptvirus
+    # Es wird gepruft, ob der Zustand nicht Gameover ist und eine Pfeiltaste gedrueckt wird
     if zustand != zustandsliste[5]:
         if pygame.key.get_pressed()[pygame.locals.K_LEFT]:
             if eigenschaftenHauptvirus["Laenge"] == 0:
-                zustand = zustandsliste[2]
-            elif virenKette["virenKetteZustand"][0] != "Rechts":
-                zustand = zustandsliste[2]
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[2]
+            elif zustand != "Rechts":
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[2]
         elif pygame.key.get_pressed()[pygame.locals.K_RIGHT]:
             if eigenschaftenHauptvirus["Laenge"] == 0:
-                zustand = zustandsliste[3]
-            elif virenKette["virenKetteZustand"][0] != "Links":
-                zustand = zustandsliste[3]
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[3]
+            elif zustand != "Links":
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[3]
         elif pygame.key.get_pressed()[pygame.locals.K_UP]:
             if eigenschaftenHauptvirus["Laenge"] == 0:
-                zustand = zustandsliste[0]
-            elif virenKette["virenKetteZustand"][0] != "Unten":
-                zustand = zustandsliste[0]
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[0]
+            elif zustand != "Unten":
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[0]
         elif pygame.key.get_pressed()[pygame.locals.K_DOWN]:
             if eigenschaftenHauptvirus["Laenge"] == 0:
-                zustand = zustandsliste[1]
-            elif virenKette["virenKetteZustand"][0] != "Oben":
-                zustand = zustandsliste[1]
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[1]
+            elif zustand != "Oben":
+                eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[1]
 
-# Zustandsspeicher vom Hauptvirus aktualisieren
-# An der erste Stelle von zustandsspeicherHauptvirus wird der aktuelle Zustand gespeichert
-# Wenn die Zustaende ueber 100 sind, wird der letzte geloescht
-    zustandsspeicherHauptvirus.insert(0, zustand)
-    if len(zustandsspeicherHauptvirus) == 101:
-        zustandsspeicherHauptvirus.pop()
-# Wenn der erste Kleinvirus angehaengt wird, soll er zunaechst zustandsanzahl-mal die aktuelle Richtung von Hauptvirus uebernehmen
-    if eigenschaftenHauptvirus["Laenge"] == 0:
+# Alle 50 Pixel
+
+    if eigenschaftenHauptvirus["PositionX"] % 50 == 6 and eigenschaftenHauptvirus["PositionY"] % 50 == 6:
+        zustand = eigenschaftenHauptvirus["NaechsterZustand"]
+
+# Geschwindigkeitsanpassung
+        if eigenschaftenHauptvirus["Laenge"] >= 100:
+            geschwindigkeit = 10
+        elif eigenschaftenHauptvirus["Laenge"] >= 50:
+            geschwindigkeit = 5
+        elif eigenschaftenHauptvirus["Laenge"] >= 0:
+            geschwindigkeit = 4
+        elif eigenschaftenHauptvirus["Laenge"] >= 5:
+            geschwindigkeit = 2.5
+        elif eigenschaftenHauptvirus["Laenge"] >= 1:
+            geschwindigkeit = 2
+        elif eigenschaftenHauptvirus["Laenge"] >= 0:
+            geschwindigkeit = 1
+        pixelaenderung = geschwindigkeit / 2
+
+# Aktualisieren des aktuellen Zustands und nächsten Zustands von der Viruskette alle 50 Pixel nach der Aenderung des Hauptvirus, aber vor der Bewegung
         listenIndex = 0
-        for zustandsposition in zustandsspeicherHauptvirus:
-            zustandsspeicherHauptvirus[listenIndex] = zustand
+        for virusnummer in virenKette["virenKetteZustand"]:
+            virenKette["virenKetteZustand"][listenIndex] = virenKette["NaechsterZustand"][listenIndex]
+            listenIndex += 1
+        listenIndex = 0
+        for virusnummer in virenKette["NaechsterZustand"]:
+            if listenIndex == 0:
+                virenKette["NaechsterZustand"][listenIndex] = zustand
+            else:
+                virenKette["NaechsterZustand"][listenIndex] = virenKette["virenKetteZustand"][listenIndex - 1]
             listenIndex += 1
 
 # Prüfung, in welche Richtung sich der Spieler automatisch nach vorne bewegen soll.
 # Wenn die Richtung ausserhalb des Spielfelds ist, dann wird der Zustand auf Gameover gesetzt
+# Wenn die Raender aktiv sind werden die Raender auch beruecksichtigt
+# Nach Oben
     if zustand == zustandsliste[0]:
-        if eigenschaftenHauptvirus["PositionY"] > 0:
+        if randaktiv:
+            if eigenschaftenHauptvirus["PositionY"] > 5 or (
+                    eigenschaftenHauptvirus["PositionX"] > 755 and eigenschaftenHauptvirus[
+                "PositionX"] < 807):  # > 5 wegen dem Rand
+                eigenschaftenHauptvirus["PositionY"] -= pixelaenderung
+                if eigenschaftenHauptvirus["PositionY"] < -50:
+                    eigenschaftenHauptvirus["PositionX"] = 256
+                    eigenschaftenHauptvirus["PositionY"] = screenHoehe
+            else:
+                zustand = zustandsliste[5]
+                print(zustand)
+        elif eigenschaftenHauptvirus["PositionY"] > 5:
             eigenschaftenHauptvirus["PositionY"] -= pixelaenderung
         else:
             zustand = zustandsliste[5]
             print(zustand)
-
+    # Nach Unten
     elif zustand == zustandsliste[1]:
-        if eigenschaftenHauptvirus["PositionY"] < screenHoehe - 50: # 50 abziehen, wegen Objektlaenge
+        if randaktiv:
+            if eigenschaftenHauptvirus["PositionY"] < screenHoehe - 55 or (
+                    eigenschaftenHauptvirus["PositionX"] > 255 and eigenschaftenHauptvirus[
+                "PositionX"] < 356):  # 55 abziehen, wegen Objektlaenge+Rand
+                eigenschaftenHauptvirus["PositionY"] += pixelaenderung
+                if eigenschaftenHauptvirus["PositionY"] > screenHoehe:
+                    eigenschaftenHauptvirus["PositionX"] = 756
+                    eigenschaftenHauptvirus["PositionY"] = -50
+            else:
+                zustand = zustandsliste[5]
+                print(zustand)
+        elif eigenschaftenHauptvirus["PositionY"] < screenHoehe - 55:
             eigenschaftenHauptvirus["PositionY"] += pixelaenderung
         else:
             zustand = zustandsliste[5]
             print(zustand)
-
+    # Nach Links
     elif zustand == zustandsliste[2]:
-        if eigenschaftenHauptvirus["PositionX"] > 0:
+        if randaktiv:
+            if eigenschaftenHauptvirus["PositionX"] > 5 or (
+                    eigenschaftenHauptvirus["PositionY"] > 155 and eigenschaftenHauptvirus[
+                "PositionY"] < 256):  # > 5 wegen dem Rand
+                eigenschaftenHauptvirus["PositionX"] -= pixelaenderung
+                if eigenschaftenHauptvirus["PositionX"] < -50:
+                    eigenschaftenHauptvirus["PositionX"] = screenBreite
+                    eigenschaftenHauptvirus["PositionY"] = 606
+            else:
+                zustand = zustandsliste[5]
+                print(zustand)
+        elif eigenschaftenHauptvirus["PositionX"] > 5:
             eigenschaftenHauptvirus["PositionX"] -= pixelaenderung
         else:
             zustand = zustandsliste[5]
             print(zustand)
-
+    # Nach Rechts
     elif zustand == zustandsliste[3]:
-        if eigenschaftenHauptvirus["PositionX"] < screenBreite - 50: # 50 abziehen, wegen Objektlaenge
+        if randaktiv:
+            if eigenschaftenHauptvirus["PositionX"] < screenBreite - 55 or (
+                    eigenschaftenHauptvirus["PositionY"] > 605 and eigenschaftenHauptvirus[
+                "PositionY"] < 706):  # 55 abziehen, wegen Objektlaenge+Rand
+                eigenschaftenHauptvirus["PositionX"] += pixelaenderung
+                if eigenschaftenHauptvirus["PositionX"] > screenBreite:
+                    eigenschaftenHauptvirus["PositionX"] = -50
+                    eigenschaftenHauptvirus["PositionY"] = 156
+            else:
+                zustand = zustandsliste[5]
+                print(zustand)
+        elif eigenschaftenHauptvirus["PositionX"] < screenBreite - 55:  # 50 abziehen, wegen Objektlaenge
             eigenschaftenHauptvirus["PositionX"] += pixelaenderung
         else:
             zustand = zustandsliste[5]
             print(zustand)
 
-# Zuruecksetzen aller Zustaende, wenn der Rand getroffen wurde
+    # Zuruecksetzen aller Zustaende, wenn Gameover ist
     elif zustand == zustandsliste[5]:
         zustand = zustandsliste[4]
-        eigenschaftenHauptvirus["PositionX"] = 600
-        eigenschaftenHauptvirus["PositionY"] = 400
+        eigenschaftenHauptvirus["PositionX"] = 606
+        eigenschaftenHauptvirus["PositionY"] = 406
         eigenschaftenHauptvirus["Laenge"] = 0
         virenKette["virenKettePositionX"] = []
         virenKette["virenKettePositionY"] = []
         virenKette["virenKetteZustand"] = []
         virenKette["virenKetteBild"] = []
-        zustandsspeicherViruskette = {}
-        zustandsspeicherHauptvirus = []
-        geschwindigkeit = 1
-# Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
+        virenKette["NaechsterZustand"] = []
+        eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[4]
+        maskeAktiv = False
+        spritzeAktiv = False
+        # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
         time.sleep(1)
 
-# Kollisionspruefung mit der Virenkette
-# Die Durchlaeufe sind von der Laenge des Virus abhaengig
+    # Virenkettepositionen aktualisieren, nachdem der Rand getroffen wurde
+    if randaktiv:
+        listenIndex = 0
+        for position in virenKette["virenKettePositionX"]:
+            # Nach oben
+            if virenKette["virenKettePositionY"][listenIndex] < -50:
+                virenKette["virenKettePositionX"][listenIndex] = 256
+                virenKette["virenKettePositionY"][listenIndex] = screenHoehe
+            # Nach unten
+            if virenKette["virenKettePositionY"][listenIndex] > screenHoehe:
+                virenKette["virenKettePositionX"][listenIndex] = 756
+                virenKette["virenKettePositionY"][listenIndex] = -50
+            # Nach Links
+            if virenKette["virenKettePositionX"][listenIndex] < -50:
+                virenKette["virenKettePositionX"][listenIndex] = screenBreite
+                virenKette["virenKettePositionY"][listenIndex] = 606
+            # Nach Rechts
+            if virenKette["virenKettePositionX"][listenIndex] > screenBreite:
+                virenKette["virenKettePositionX"][listenIndex] = -50
+                virenKette["virenKettePositionY"][listenIndex] = 156
+            listenIndex += 1
+
+    # Kollisionspruefung mit der Virenkette
+    # Die Durchlaeufe sind von der Laenge des Virus abhaengig
     listenIndex = 0
     for position in virenKette["virenKettePositionX"]:
         if listenIndex >= 1 and zustand != zustandsliste[5]:
-            if not (eigenschaftenHauptvirus["PositionX"] >= virenKette["virenKettePositionX"][listenIndex] + 50 or eigenschaftenHauptvirus["PositionX"] <= virenKette["virenKettePositionX"][listenIndex] - 50) and not (eigenschaftenHauptvirus["PositionY"] >= virenKette["virenKettePositionY"][listenIndex] + 50 or eigenschaftenHauptvirus["PositionY"] <= virenKette["virenKettePositionY"][listenIndex] - 50):
+            if not (eigenschaftenHauptvirus["PositionX"] >= virenKette["virenKettePositionX"][listenIndex] + 50 or
+                    eigenschaftenHauptvirus["PositionX"] <= virenKette["virenKettePositionX"][
+                        listenIndex] - 50) and not (
+                    eigenschaftenHauptvirus["PositionY"] >= virenKette["virenKettePositionY"][listenIndex] + 50 or
+                    eigenschaftenHauptvirus["PositionY"] <= virenKette["virenKettePositionY"][listenIndex] - 50):
                 zustand = zustandsliste[5]
                 print(zustand)
         listenIndex += 1
 
-
-
-# Spiellogik ist hier integriert
+    # Spiellogik ist hier integriert
     if zustand != "Nichts" and zustand != "Gameover":
-        eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus, virusBilder, virenKette)
+        eigenschaftenKleinVirus = kleineViren(eigenschaftenHauptvirus["PositionX"],
+                                              eigenschaftenHauptvirus["PositionY"], eigenschaftenKleinVirus,
+                                              virusBilder, virenKette)
 
-        collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette["virenKettePositionX"], virenKette["virenKettePositionY"], virenKette["virenKetteZustand"], zustand, virenKette["virenKetteBild"], zustandsanzahl)
+        collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette["virenKettePositionX"],
+                          virenKette["virenKettePositionY"], virenKette["virenKetteZustand"], zustand,
+                          virenKette["virenKetteBild"], virenKette["NaechsterZustand"])
+        eigenschaftenMaske = zusatzObjektMaske(eigenschaftenMaske)
+        eigenschaftenSpritze = zusatzObjektSpritze(eigenschaftenSpritze)
+        maskeAktiv = collisionPruefungMaske(eigenschaftenHauptvirus, eigenschaftenMaske, maskeAktiv)
+        spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv)
 
-# Zustandsspeicher von Virenkette aktualisieren
-# Wird nur gemacht, wenn mindestens 1 Virus angehaengt ist
-# Logik ist analog zu Hauptvirus
-    if len(virenKette["virenKetteZustand"]) >= 1:
-        for virusnummer in zustandsspeicherViruskette:
-            zustandsspeicherViruskette[virusnummer].insert(0, virenKette["virenKetteZustand"][virusnummer])
-            if len(zustandsspeicherViruskette[virusnummer]) == (101):
-                zustandsspeicherViruskette[virusnummer].pop()
-        listenIndex = 0
-        for zustandsposition in zustandsspeicherViruskette[eigenschaftenHauptvirus["Laenge"] - 1]:
-            zustandsspeicherViruskette[eigenschaftenHauptvirus["Laenge"] - 1][listenIndex] = virenKette["virenKetteZustand"][len(virenKette["virenKetteZustand"]) - 1]
-            listenIndex += 1
-
-# Aktualisieren des aktuellen Zustands von der Viruskette
-# Logik ist analog zu Hauptvirus
-    listenIndex = 0
-    for virusnummer in virenKette["virenKetteZustand"]:
-        if listenIndex == 0:
-            virenKette["virenKetteZustand"][listenIndex] = zustandsspeicherHauptvirus[zustandsanzahl]
-        else:
-            virenKette["virenKetteZustand"][listenIndex] = zustandsspeicherViruskette[listenIndex - 1][zustandsanzahl]
-        listenIndex += 1
-
-# Bewegung der Viruskette
-# Logik ist analog zu Hauptvirus
-# Verzoegerung mit Hilfe des Zustandsspeichers
+    # Bewegung der Viruskette
+    # Logik ist analog zu Hauptvirus
+    # Verzoegerung mit Hilfe des Zustandsspeichers
     virenIndex = 0
-    for anzahlVirus in virenKette["virenKettePositionX"]:
-        if virenIndex == 0:
-            if zustandsspeicherHauptvirus[zustandsanzahl] == "Oben":
-                virenKette["virenKettePositionY"][virenIndex] -= pixelaenderung
-            elif zustandsspeicherHauptvirus[zustandsanzahl] == "Unten":
-                virenKette["virenKettePositionY"][virenIndex] += pixelaenderung
-            elif zustandsspeicherHauptvirus[zustandsanzahl] == "Links":
-                virenKette["virenKettePositionX"][virenIndex] -= pixelaenderung
-            elif zustandsspeicherHauptvirus[zustandsanzahl] == "Rechts":
-                virenKette["virenKettePositionX"][virenIndex] += pixelaenderung
-        else:
-            if virenKette["virenKetteZustand"][virenIndex] == "Oben":
-                virenKette["virenKettePositionY"][virenIndex] -= pixelaenderung
-            elif virenKette["virenKetteZustand"][virenIndex] == "Unten":
-                virenKette["virenKettePositionY"][virenIndex] += pixelaenderung
-            elif virenKette["virenKetteZustand"][virenIndex] == "Links":
-                virenKette["virenKettePositionX"][virenIndex] -= pixelaenderung
-            elif virenKette["virenKetteZustand"][virenIndex] == "Rechts":
-                virenKette["virenKettePositionX"][virenIndex] += pixelaenderung
+    for zustandKette in virenKette["virenKetteZustand"]:
+        if zustandKette == "Oben":
+            virenKette["virenKettePositionY"][virenIndex] -= pixelaenderung
+        elif zustandKette == "Unten":
+            virenKette["virenKettePositionY"][virenIndex] += pixelaenderung
+        elif zustandKette == "Links":
+            virenKette["virenKettePositionX"][virenIndex] -= pixelaenderung
+        elif zustandKette == "Rechts":
+            virenKette["virenKettePositionX"][virenIndex] += pixelaenderung
         virenIndex += 1
 
-# Überprüfen, ob Nutzer eine Aktion durchgeführt hat
-    for event in pygame.event.get():
-        if event.type == pygame.locals.QUIT or (
-                event.type == pygame.locals.KEYDOWN and event.key == pygame.locals.K_ESCAPE):
-# Spiel wird beendet!
-            spielaktiv=False
+    if maskeAktiv:
+        eigenschaftenMaske["maskeAktivZaehler"] += 1
+        if eigenschaftenMaske["maskeAktivZaehler"] == 500:
+            eigenschaftenMaske["maskeAktivZaehler"] = 0
+            maskeAktiv = False
 
-# Speilfeld loeschen
+    # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
+    for event in pygame.event.get():
+        if event.type == pygame.locals.QUIT:
+            # Spiel wird beendet!
+            spielaktiv = False
+        # Das Menue wird aktiviert und gezeichnet, wenn Escape gedrueckt wird
+        if event.type == pygame.locals.KEYDOWN and event.key == pygame.locals.K_ESCAPE:
+            menu.enable()
+    while menu.is_enabled():
+        menu.update(pygame.event.get())
+        if menu.is_enabled():
+            menu.draw(screen)
+        pygame.display.update()
+    # Speilfeld loeschen
     screen.fill((0, 0, 0))  # Black R,G,B
-# Kleinvirus zeichnen
+    # Kleinvirus, Maske und Spritze zeichnen
     if zustand != "Nichts" and zustand != "Gameover":
         screen.blit(eigenschaftenKleinVirus["Bild"], (eigenschaftenKleinVirus["PositionX"], eigenschaftenKleinVirus["PositionY"]))
-# Hauptvirus zeichnen
-# Umdrehen Idee von: https://www.pygame.org/docs/ref/transform.html#pygame.transform.rotate
+
+    # Hauptvirus zeichnen
+    # Umdrehen Idee von: https://www.pygame.org/docs/ref/transform.html#pygame.transform.rotate
     if zustand == "Oben":
         hauptVirusRichtung = pygame.transform.rotate(hauptVirus, 180)
     elif zustand == "Links":
@@ -361,31 +568,61 @@ while spielaktiv:
         hauptVirusRichtung = hauptVirus
     screen.blit(hauptVirusRichtung, (eigenschaftenHauptvirus["PositionX"], eigenschaftenHauptvirus["PositionY"]))
 
-# Virenkette zeichnen
+    # Virenkette zeichnen
     virenIndex = 0
     for anzahlVirus in virenKette["virenKettePositionX"]:
         if virenKette["virenKetteZustand"][virenIndex] == "Oben":
-            virenKette["virenKetteBildRichtung"].append(pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 180))
+            virenKette["virenKetteBildRichtung"].append(
+                pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 180))
         elif virenKette["virenKetteZustand"][virenIndex] == "Links":
-            virenKette["virenKetteBildRichtung"].append(pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 270))
+            virenKette["virenKetteBildRichtung"].append(
+                pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 270))
         elif virenKette["virenKetteZustand"][virenIndex] == "Rechts":
-            virenKette["virenKetteBildRichtung"].append(pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 90))
+            virenKette["virenKetteBildRichtung"].append(
+                pygame.transform.rotate(virenKette["virenKetteBild"][virenIndex], 90))
         else:
             virenKette["virenKetteBildRichtung"].append(virenKette["virenKetteBild"][virenIndex])
-        screen.blit(virenKette["virenKetteBildRichtung"][virenIndex], (virenKette["virenKettePositionX"][virenIndex], virenKette["virenKettePositionY"][virenIndex]))
+        screen.blit(virenKette["virenKetteBildRichtung"][virenIndex],
+                    (virenKette["virenKettePositionX"][virenIndex], virenKette["virenKettePositionY"][virenIndex]))
         virenIndex += 1
     virenKette["virenKetteBildRichtung"] = []
 
-#Textfeld zeichnen
+    if not eigenschaftenMaske["PositionX"] == -1 and zustand != "Nichts" and zustand != "Gameover":
+        screen.blit(eigenschaftenMaske["Bild"], (eigenschaftenMaske["PositionX"], eigenschaftenMaske["PositionY"]))
+
+    if not spritzeAktiv and zustand != "Nichts" and zustand != "Gameover":
+        screen.blit(eigenschaftenSpritze["Bild"], (eigenschaftenSpritze["PositionX"], eigenschaftenSpritze["PositionY"]))
+
+    # Textfeld zeichnen
     textfeldLaenge = schriftart.render('Laenge: ' + str(eigenschaftenHauptvirus["Laenge"]), False, (255, 255, 255))
     textfeldHighscore = schriftart.render('Highscore: ' + highscore, False, (255, 255, 255))
     screen.blit(textfeldLaenge, (10, 0))
     screen.blit(textfeldHighscore, (980, 0))
 
-# Fenster aktualisieren
+    # Randlinien zeichenen
+    if randaktiv:
+        # Rand oben
+        pygame.draw.line(screen, (255, 255, 255), (3, 3), (756, 3), width=3)
+        pygame.draw.line(screen, (255, 255, 255), (856, 3), (screenBreite - 3, 3), width=3)
+        # Rand links
+        pygame.draw.line(screen, (255, 255, 255), (3, 3), (3, 156), width=3)
+        pygame.draw.line(screen, (255, 255, 255), (3, 256), (3, screenHoehe - 3), width=3)
+        # Rand rechts
+        pygame.draw.line(screen, (255, 255, 255), (screenBreite - 3, 3), (screenBreite - 3, 606), width=3)
+        pygame.draw.line(screen, (255, 255, 255), (screenBreite - 3, 706), (screenBreite - 3, screenHoehe - 3), width=3)
+        # Rand unten
+        pygame.draw.line(screen, (255, 255, 255), (3, screenHoehe - 3), (256, screenHoehe - 3), width=3)
+        pygame.draw.line(screen, (255, 255, 255), (356, screenHoehe - 3), (screenBreite - 3, screenHoehe - 3), width=3)
+    else:
+        pygame.draw.line(screen, (255, 255, 255), (3, 3), (screenBreite - 3, 3), width=3)
+        pygame.draw.line(screen, (255, 255, 255), (3, 3), (3, screenHoehe - 3), width=3)
+        pygame.draw.line(screen, (255, 255, 255), (screenBreite - 3, 3), (screenBreite - 3, screenHoehe - 3), width=3)
+        pygame.draw.line(screen, (255, 255, 255), (3, screenHoehe - 3), (screenBreite - 3, screenHoehe - 3), width=3)
+
+    # Fenster aktualisieren
     pygame.display.flip()
 
-# Refresh-Zeiten festlegen
+    # Refresh-Zeiten festlegen
     clock.tick(100)
 
 pygame.quit()

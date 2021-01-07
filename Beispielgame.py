@@ -219,10 +219,19 @@ def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
         eigenschaftenMaske["PositionX"] = -1
     return maskeAktiv
 
-def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv):
+def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette):
     if not (hauptVirus["PositionX"] >= eigenschaftenSpritze["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenSpritze["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenSpritze["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenSpritze["PositionY"] - 50):
-        eigenschaftenSpritze["SpritzeZaehler"] = 0
-        spritzeAktiv = True
+        eigenschaftenSpritze["SpritzeZaehler"] = 3999
+        if not maskeAktiv:
+            hauptVirus["Laenge"] = int(hauptVirus["Laenge"]/2)
+            while hauptVirus["Laenge"] != len(virenKette["virenKetteZustand"]):
+                virenKette["virenKetteZustand"].pop()
+                virenKette["virenKettePositionX"].pop()
+                virenKette["virenKettePositionY"].pop()
+                virenKette["virenKetteBild"].pop()
+                virenKette["virenKetteBildRichtung"].pop()
+                virenKette["NaechsterZustand"].pop()
+
     return spritzeAktiv
 
 # Funktion fuer kleine Viren
@@ -514,7 +523,7 @@ while spielaktiv:
         eigenschaftenMaske = zusatzObjektMaske(eigenschaftenMaske)
         eigenschaftenSpritze = zusatzObjektSpritze(eigenschaftenSpritze)
         maskeAktiv = collisionPruefungMaske(eigenschaftenHauptvirus, eigenschaftenMaske, maskeAktiv)
-        spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv)
+        spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette)
 
     # Bewegung der Viruskette
     # Logik ist analog zu Hauptvirus

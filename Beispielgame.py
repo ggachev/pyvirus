@@ -471,7 +471,7 @@ while spielaktiv:
                     eigenschaftenHauptvirus["PositionX"] > 755 and eigenschaftenHauptvirus[
                 "PositionX"] < 807):  # > 5 wegen dem Rand
                 eigenschaftenHauptvirus["PositionY"] -= pixelaenderung
-                if eigenschaftenHauptvirus["PositionY"] < -43:
+                if eigenschaftenHauptvirus["PositionY"] < -(44-pixelaenderung):
                     eigenschaftenHauptvirus["PositionX"] = 256
                     eigenschaftenHauptvirus["PositionY"] = screenHoehe-6
             else:
@@ -507,7 +507,7 @@ while spielaktiv:
                     eigenschaftenHauptvirus["PositionY"] > 155 and eigenschaftenHauptvirus[
                 "PositionY"] < 256):  # > 5 wegen dem Rand
                 eigenschaftenHauptvirus["PositionX"] -= pixelaenderung
-                if eigenschaftenHauptvirus["PositionX"] < -43:
+                if eigenschaftenHauptvirus["PositionX"] < -(44-pixelaenderung):
                     eigenschaftenHauptvirus["PositionX"] = screenBreite-6
                     eigenschaftenHauptvirus["PositionY"] = 606
             else:
@@ -578,20 +578,20 @@ while spielaktiv:
         listenIndex = 0
         for position in virenKette["virenKettePositionX"]:
             # Nach oben
-            if virenKette["virenKettePositionY"][listenIndex] < -43:
+            if virenKette["virenKettePositionY"][listenIndex] < -(44-pixelaenderung):
                 virenKette["virenKettePositionX"][listenIndex] = 256
                 virenKette["virenKettePositionY"][listenIndex] = screenHoehe-6
             # Nach unten
             if virenKette["virenKettePositionY"][listenIndex] > screenHoehe-5:
                 virenKette["virenKettePositionX"][listenIndex] = 756
-                virenKette["virenKettePositionY"][listenIndex] = -43
+                virenKette["virenKettePositionY"][listenIndex] = -(44-pixelaenderung)
             # Nach Links
-            if virenKette["virenKettePositionX"][listenIndex] < -43:
+            if virenKette["virenKettePositionX"][listenIndex] < -(44-pixelaenderung):
                 virenKette["virenKettePositionX"][listenIndex] = screenBreite-6
                 virenKette["virenKettePositionY"][listenIndex] = 606
             # Nach Rechts
             if virenKette["virenKettePositionX"][listenIndex] > screenBreite-5:
-                virenKette["virenKettePositionX"][listenIndex] = -43
+                virenKette["virenKettePositionX"][listenIndex] = -(44-pixelaenderung)
                 virenKette["virenKettePositionY"][listenIndex] = 156
             listenIndex += 1
 

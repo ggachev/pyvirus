@@ -485,13 +485,13 @@ while spielaktiv:
     # Nach Unten
     elif zustand == zustandsliste[1]:
         if randaktiv:
-            if eigenschaftenHauptvirus["PositionY"] < screenHoehe-6 - 55 or (
+            if eigenschaftenHauptvirus["PositionY"] < screenHoehe - 55 or (
                     eigenschaftenHauptvirus["PositionX"] > 255 and eigenschaftenHauptvirus[
                 "PositionX"] < 356):  # 55 abziehen, wegen Objektlaenge+Rand
                 eigenschaftenHauptvirus["PositionY"] += pixelaenderung
-                if eigenschaftenHauptvirus["PositionY"] > screenHoehe-5:
+                if eigenschaftenHauptvirus["PositionY"] > screenHoehe-6:
                     eigenschaftenHauptvirus["PositionX"] = 756
-                    eigenschaftenHauptvirus["PositionY"] = -43
+                    eigenschaftenHauptvirus["PositionY"] = -(44-pixelaenderung)
             else:
                 zustand = zustandsliste[5]
                 print(zustand)
@@ -521,12 +521,12 @@ while spielaktiv:
     # Nach Rechts
     elif zustand == zustandsliste[3]:
         if randaktiv:
-            if eigenschaftenHauptvirus["PositionX"] < screenBreite-6 - 55 or (
+            if eigenschaftenHauptvirus["PositionX"] < screenBreite - 55 or (
                     eigenschaftenHauptvirus["PositionY"] > 605 and eigenschaftenHauptvirus[
                 "PositionY"] < 706):  # 55 abziehen, wegen Objektlaenge+Rand
                 eigenschaftenHauptvirus["PositionX"] += pixelaenderung
-                if eigenschaftenHauptvirus["PositionX"] > screenBreite-5:
-                    eigenschaftenHauptvirus["PositionX"] = -43
+                if eigenschaftenHauptvirus["PositionX"] > screenBreite-6:
+                    eigenschaftenHauptvirus["PositionX"] = -(44-pixelaenderung)
                     eigenschaftenHauptvirus["PositionY"] = 156
             else:
                 zustand = zustandsliste[5]
@@ -578,20 +578,20 @@ while spielaktiv:
         listenIndex = 0
         for position in virenKette["virenKettePositionX"]:
             # Nach oben
-            if virenKette["virenKettePositionY"][listenIndex] < -44:
+            if virenKette["virenKettePositionY"][listenIndex] < -43:
                 virenKette["virenKettePositionX"][listenIndex] = 256
                 virenKette["virenKettePositionY"][listenIndex] = screenHoehe-6
             # Nach unten
-            if virenKette["virenKettePositionY"][listenIndex] > screenHoehe-6:
+            if virenKette["virenKettePositionY"][listenIndex] > screenHoehe-5:
                 virenKette["virenKettePositionX"][listenIndex] = 756
-                virenKette["virenKettePositionY"][listenIndex] = -44
+                virenKette["virenKettePositionY"][listenIndex] = -43
             # Nach Links
-            if virenKette["virenKettePositionX"][listenIndex] < -44:
+            if virenKette["virenKettePositionX"][listenIndex] < -43:
                 virenKette["virenKettePositionX"][listenIndex] = screenBreite-6
                 virenKette["virenKettePositionY"][listenIndex] = 606
             # Nach Rechts
-            if virenKette["virenKettePositionX"][listenIndex] > screenBreite-6:
-                virenKette["virenKettePositionX"][listenIndex] = -44
+            if virenKette["virenKettePositionX"][listenIndex] > screenBreite-5:
+                virenKette["virenKettePositionX"][listenIndex] = -43
                 virenKette["virenKettePositionY"][listenIndex] = 156
             listenIndex += 1
 

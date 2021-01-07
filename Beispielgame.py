@@ -119,6 +119,9 @@ maskeAktiv = False
 # Variable fuer Impfung
 spritzeAktiv = False
 
+# Variable fuer Schwierigkeitsgrad
+schwierigkeitsgradAktiv = False
+
 # https://icons8.de/icon/52583/spritze
 Spritze = pygame.image.load('Spritze.png')
 Spritze = pygame.transform.scale(Spritze, (50, 50))
@@ -157,7 +160,12 @@ def name_aendern(wert):
     print(wert)
 
 def setze_schwierigkeitsgrad(wert, schwierigkeitsgrad):
-    pass
+    global schwierigkeitsgradAktiv
+    if schwierigkeitsgrad == 1:
+        schwierigkeitsgradAktiv = False
+    if schwierigkeitsgrad == 2:
+        schwierigkeitsgradAktiv = True
+    return schwierigkeitsgradAktiv
 
 def setze_rand(wert, x):
     global randaktiv
@@ -236,17 +244,20 @@ def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
         eigenschaftenMaske["PositionX"] = -1
     return maskeAktiv
 
-def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette):
+def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette, zustand, schwierigkeitsgradAktiv):
     if not (hauptVirus["PositionX"] >= eigenschaftenSpritze["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenSpritze["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenSpritze["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenSpritze["PositionY"] - 50):
         eigenschaftenSpritze["SpritzeZaehler"] = 3999
         if not maskeAktiv:
-            hauptVirus["Laenge"] = int(hauptVirus["Laenge"]/2)
-            while hauptVirus["Laenge"] != len(virenKette["virenKetteZustand"]):
-                virenKette["virenKetteZustand"].pop()
-                virenKette["virenKettePositionX"].pop()
-                virenKette["virenKettePositionY"].pop()
-                virenKette["virenKetteBild"].pop()
-                virenKette["NaechsterZustand"].pop()
+            if schwierigkeitsgradAktiv:
+                gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, highscore, maskeAktiv)
+            else:
+                hauptVirus["Laenge"] = int(hauptVirus["Laenge"]/2)
+                while hauptVirus["Laenge"] != len(virenKette["virenKetteZustand"]):
+                    virenKette["virenKetteZustand"].pop()
+                    virenKette["virenKettePositionX"].pop()
+                    virenKette["virenKettePositionY"].pop()
+                    virenKette["virenKetteBild"].pop()
+                    virenKette["NaechsterZustand"].pop()
 
     return spritzeAktiv
 
@@ -274,8 +285,8 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
 
         while not position:
             position = True
-            randomx = random.randrange(0, 1150)
-            randomy = random.randrange(0, 750)
+            randomx = random.randrange(3, 1159)
+            randomy = random.randrange(3, 759)
 
             if not ((randomx >= x + 200 or randomx <= x - 200) and (randomy >= y + 200 or randomy <= y - 200)):
                 position = False
@@ -298,18 +309,29 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette):
 # Funktion für die Maske (Analog zu der Funktion kleineViren)
 # es wird eine zufaellige Postion(X, Y) mit dem Bild der Maske
 # Die Position der Maske wird alle 5000 Durchlaeufe neu berechnet
-def zusatzObjektMaske(eigenschaftenMaske):
+def zusatzObjektMaske(eigenschaftenMaske, x, y):
     z = eigenschaftenMaske["MaskeZaehler"]
     z += 1
     if z == 5000:
-        randomx = random.randrange(0, 1150)
-        randomy = random.randrange(0, 750)
-        eigenschaftenMaske["Bild"] = Maske
+
         position = False
+
         while not position:
             position = True
-            randomx = random.randrange(0, 1150)
-            randomy = random.randrange(0, 750)
+
+            randomx = random.randrange(3, 1159)
+            randomy = random.randrange(3, 759)
+            eigenschaftenMaske["Bild"] = Maske
+            if not ((randomx >= x + 200 or randomx <= x - 200) and (randomy >= y + 200 or randomy <= y - 200)):
+                position = False
+            listenIndex = 0
+            for Position in virenKette["virenKettePositionX"]:
+                if ((randomx <= virenKette["virenKettePositionX"][listenIndex] + 50 and randomx >=
+                     virenKette["virenKettePositionX"][listenIndex] - 50) and (
+                        randomy <= virenKette["virenKettePositionY"][listenIndex] + 50 and randomy >=
+                        virenKette["virenKettePositionY"][listenIndex] - 50)):
+                    position = False
+                listenIndex += 1
         eigenschaftenMaske["PositionX"] = randomx
         eigenschaftenMaske["PositionY"] = randomy
         z = 0
@@ -319,23 +341,64 @@ def zusatzObjektMaske(eigenschaftenMaske):
 # Funktion für die Spritze (Analog zu der Funktion kleineViren)
 # es wird eine zufaellige Postion(X, Y) mit dem Bild der Spritze
 # Die Position der Spritze wird alle 4000 Durchlaeufe neu berechnet
-def zusatzObjektSpritze(eigenschaftenSpritze):
+def zusatzObjektSpritze(eigenschaftenSpritze, x, y):
     z = eigenschaftenSpritze["SpritzeZaehler"]
     z += 1
     if z == 4000:
-        randomx = random.randrange(0, 1150)
-        randomy = random.randrange(0, 750)
-        eigenschaftenSpritze["Bild"] = Spritze
         position = False
+
         while not position:
             position = True
-            randomx = random.randrange(0, 1150)
-            randomy = random.randrange(0, 750)
+
+            randomx = random.randrange(3, 1159)
+            randomy = random.randrange(3, 759)
+            if not ((randomx >= x + 200 or randomx <= x - 200) and (randomy >= y + 200 or randomy <= y - 200)):
+                position = False
+            listenIndex = 0
+            for Position in virenKette["virenKettePositionX"]:
+                if ((randomx <= virenKette["virenKettePositionX"][listenIndex] + 50 and randomx >=
+                     virenKette["virenKettePositionX"][listenIndex] - 50) and (
+                        randomy <= virenKette["virenKettePositionY"][listenIndex] + 50 and randomy >=
+                        virenKette["virenKettePositionY"][listenIndex] - 50)):
+                    position = False
+                listenIndex += 1
         eigenschaftenSpritze["PositionX"] = randomx
         eigenschaftenSpritze["PositionY"] = randomy
         z = 0
     eigenschaftenSpritze["SpritzeZaehler"] = z
     return eigenschaftenSpritze
+
+def gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, highscore, maskeAktiv):
+    zustand = zustandsliste[4]
+    # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
+    # Score Update
+    if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
+        highscore = eigenschaftenHauptvirus["Laenge"]
+        textDisplay('New Highscore:' + 'Name ' + str(highscore))
+        scoreDatei = open("Score.txt", "w")
+        highscore = scoreDatei.write(str(highscore))
+        scoreDatei.close()
+
+        scoreDatei = open("Score.txt", "r")
+        highscore = scoreDatei.readline()
+        scoreDatei.close()
+
+    else:
+        textDisplay('GAME OVER')
+
+    eigenschaftenHauptvirus["PositionX"] = 606
+    eigenschaftenHauptvirus["PositionY"] = 406
+    eigenschaftenHauptvirus["Laenge"] = 0
+    virenKette["virenKettePositionX"] = []
+    virenKette["virenKettePositionY"] = []
+    virenKette["virenKetteZustand"] = []
+    virenKette["virenKetteBild"] = []
+    virenKette["NaechsterZustand"] = []
+    eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[4]
+    maskeAktiv = False
+    eigenschaftenMaske["MaskeZaehler"] = 4999
+    eigenschaftenSpritze["SpritzeZaehler"] = 3999
+    geschwindigkeit = 1
 
 
 # Schleife Hauptprogramm
@@ -474,9 +537,25 @@ while spielaktiv:
             zustand = zustandsliste[5]
             print(zustand)
 
-    # Zuruecksetzen aller Zustaende, wenn Gameover ist
+    # Zuruecksetzen aller Zustaende, wenn der Rand getroffen wurde
     elif zustand == zustandsliste[5]:
         zustand = zustandsliste[4]
+    # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
+    # Score Update
+        if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
+            highscore = eigenschaftenHauptvirus["Laenge"]
+            textDisplay('New Highscore:' + 'Name ' + str(highscore))
+            scoreDatei = open("Score.txt", "w")
+            highscore = scoreDatei.write(str(highscore))
+            scoreDatei.close()
+
+            scoreDatei = open("Score.txt", "r")
+            highscore = scoreDatei.readline()
+            scoreDatei.close()
+
+        else:
+            textDisplay('GAME OVER')
+
         eigenschaftenHauptvirus["PositionX"] = 606
         eigenschaftenHauptvirus["PositionY"] = 406
         eigenschaftenHauptvirus["Laenge"] = 0
@@ -487,8 +566,11 @@ while spielaktiv:
         virenKette["NaechsterZustand"] = []
         eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[4]
         maskeAktiv = False
-        spritzeAktiv = False
-        # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
+        eigenschaftenMaske["MaskeZaehler"]=4999
+        eigenschaftenSpritze["SpritzeZaehler"]=3999
+        geschwindigkeit = 1
+
+    # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
         time.sleep(1)
 
     # Virenkettepositionen aktualisieren, nachdem der Rand getroffen wurde
@@ -536,10 +618,12 @@ while spielaktiv:
         collisionPruefung(eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette["virenKettePositionX"],
                           virenKette["virenKettePositionY"], virenKette["virenKetteZustand"], zustand,
                           virenKette["virenKetteBild"], virenKette["NaechsterZustand"])
-        eigenschaftenMaske = zusatzObjektMaske(eigenschaftenMaske)
-        eigenschaftenSpritze = zusatzObjektSpritze(eigenschaftenSpritze)
+        eigenschaftenMaske = zusatzObjektMaske(eigenschaftenMaske, eigenschaftenHauptvirus["PositionX"],
+                                              eigenschaftenHauptvirus["PositionY"],)
+        eigenschaftenSpritze = zusatzObjektSpritze(eigenschaftenSpritze, eigenschaftenHauptvirus["PositionX"],
+                                              eigenschaftenHauptvirus["PositionY"],)
         maskeAktiv = collisionPruefungMaske(eigenschaftenHauptvirus, eigenschaftenMaske, maskeAktiv)
-        spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette)
+        spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette, zustand, schwierigkeitsgradAktiv)
 
     # Bewegung der Viruskette
     # Logik ist analog zu Hauptvirus
@@ -556,28 +640,8 @@ while spielaktiv:
             virenKette["virenKettePositionX"][virenIndex] += pixelaenderung
         virenIndex += 1
 
-    if maskeAktiv:
-        eigenschaftenMaske["maskeAktivZaehler"] += 1
-        if eigenschaftenMaske["maskeAktivZaehler"] == 500:
-            eigenschaftenMaske["maskeAktivZaehler"] = 0
-            maskeAktiv = False
 
-        # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
-        # Score Update
-        if eigenschaftenHauptvirus["Laenge"] > int(highscore):
-            highscore = eigenschaftenHauptvirus["Laenge"]
 
-            # Speicher des Highscore in der Textdatei
-            if zustand == "Gameover":
-                textDisplay('New Highscore:' + 'Name ' + str(highscore))
-
-            scoreDatei = open("Score.txt", "w")
-            highscore = scoreDatei.write(str(highscore))
-            scoreDatei.close()
-
-        else:
-            if zustand == "Gameover":
-                textDisplay('GAME OVER')
 
 
     # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
@@ -641,6 +705,15 @@ while spielaktiv:
     textfeldHighscore = schriftart.render('Highscore: ' + highscore, False, (255, 255, 255))
     screen.blit(textfeldLaenge, (10, 0))
     screen.blit(textfeldHighscore, (980, 0))
+
+    if maskeAktiv:
+        textfeldMaske = schriftart.render("Schutzdauer: " + str((500-eigenschaftenMaske["maskeAktivZaehler"])/100), False, (255, 255, 255))
+        screen.blit(textfeldMaske, (400,0))
+        eigenschaftenMaske["maskeAktivZaehler"] += 1
+        if eigenschaftenMaske["maskeAktivZaehler"] == 500:
+            eigenschaftenMaske["maskeAktivZaehler"] = 0
+            maskeAktiv = False
+
 
     # Randlinien zeichenen
     if randaktiv:

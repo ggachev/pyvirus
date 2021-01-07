@@ -24,6 +24,23 @@ pygame.display.set_caption('PyVirus')
 # Bildschirm Aktualisierungen einstellen
 clock = pygame.time.Clock()
 
+#Quelle:https://pythonprogramming.net/displaying-text-pygame-screen/
+#Text nach Game
+def textObjekt(text, font):
+    textSurface = font.render(text, True, (255, 255, 255))
+    return textSurface, textSurface.get_rect()
+
+def textDisplay(text):
+    font = pygame.font.Font('comici.ttf', 90)
+    TextSurf, TextRect = textObjekt(text, font)
+    TextRect.center = ((screenBreite/2), (screenHoehe/2))
+    screen.blit(TextSurf, TextRect)
+
+    pygame.display.update()
+    time.sleep(1)
+
+
+
 # solange die Variable True ist, soll das Spiel laufen
 spielaktiv = True
 
@@ -229,7 +246,6 @@ def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, mas
                 virenKette["virenKettePositionX"].pop()
                 virenKette["virenKettePositionY"].pop()
                 virenKette["virenKetteBild"].pop()
-                virenKette["virenKetteBildRichtung"].pop()
                 virenKette["NaechsterZustand"].pop()
 
     return spritzeAktiv
@@ -545,6 +561,24 @@ while spielaktiv:
         if eigenschaftenMaske["maskeAktivZaehler"] == 500:
             eigenschaftenMaske["maskeAktivZaehler"] = 0
             maskeAktiv = False
+
+        # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
+        # Score Update
+        if eigenschaftenHauptvirus["Laenge"] > int(highscore):
+            highscore = eigenschaftenHauptvirus["Laenge"]
+
+            # Speicher des Highscore in der Textdatei
+            if zustand == "Gameover":
+                textDisplay('New Highscore:' + 'Name ' + str(highscore))
+
+            scoreDatei = open("Score.txt", "w")
+            highscore = scoreDatei.write(str(highscore))
+            scoreDatei.close()
+
+        else:
+            if zustand == "Gameover":
+                textDisplay('GAME OVER')
+
 
     # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
     for event in pygame.event.get():

@@ -24,6 +24,23 @@ pygame.display.set_caption('PyVirus')
 # Bildschirm Aktualisierungen einstellen
 clock = pygame.time.Clock()
 
+#Quelle:https://pythonprogramming.net/displaying-text-pygame-screen/
+#Text nach Game
+def textObjekt(text, font):
+    textSurface = font.render(text, True, (255, 255, 255))
+    return textSurface, textSurface.get_rect()
+
+def textDisplay(text):
+    font = pygame.font.Font('comici.ttf', 90)
+    TextSurf, TextRect = textObjekt(text, font)
+    TextRect.center = ((screenBreite/2), (screenHoehe/2))
+    screen.blit(TextSurf, TextRect)
+
+    pygame.display.update()
+    time.sleep(1)
+
+
+
 # solange die Variable True ist, soll das Spiel laufen
 spielaktiv = True
 
@@ -219,10 +236,18 @@ def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
         eigenschaftenMaske["PositionX"] = -1
     return maskeAktiv
 
-def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv):
+def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette):
     if not (hauptVirus["PositionX"] >= eigenschaftenSpritze["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenSpritze["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenSpritze["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenSpritze["PositionY"] - 50):
-        eigenschaftenSpritze["SpritzeZaehler"] = 0
-        spritzeAktiv = True
+        eigenschaftenSpritze["SpritzeZaehler"] = 3999
+        if not maskeAktiv:
+            hauptVirus["Laenge"] = int(hauptVirus["Laenge"]/2)
+            while hauptVirus["Laenge"] != len(virenKette["virenKetteZustand"]):
+                virenKette["virenKetteZustand"].pop()
+                virenKette["virenKettePositionX"].pop()
+                virenKette["virenKettePositionY"].pop()
+                virenKette["virenKetteBild"].pop()
+                virenKette["NaechsterZustand"].pop()
+
     return spritzeAktiv
 
 # Funktion fuer kleine Viren
@@ -514,7 +539,7 @@ while spielaktiv:
         eigenschaftenMaske = zusatzObjektMaske(eigenschaftenMaske)
         eigenschaftenSpritze = zusatzObjektSpritze(eigenschaftenSpritze)
         maskeAktiv = collisionPruefungMaske(eigenschaftenHauptvirus, eigenschaftenMaske, maskeAktiv)
-        spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv)
+        spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette)
 
     # Bewegung der Viruskette
     # Logik ist analog zu Hauptvirus
@@ -536,6 +561,24 @@ while spielaktiv:
         if eigenschaftenMaske["maskeAktivZaehler"] == 500:
             eigenschaftenMaske["maskeAktivZaehler"] = 0
             maskeAktiv = False
+
+        # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
+        # Score Update
+        if eigenschaftenHauptvirus["Laenge"] > int(highscore):
+            highscore = eigenschaftenHauptvirus["Laenge"]
+
+            # Speicher des Highscore in der Textdatei
+            if zustand == "Gameover":
+                textDisplay('New Highscore:' + 'Name ' + str(highscore))
+
+            scoreDatei = open("Score.txt", "w")
+            highscore = scoreDatei.write(str(highscore))
+            scoreDatei.close()
+
+        else:
+            if zustand == "Gameover":
+                textDisplay('GAME OVER')
+
 
     # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
     for event in pygame.event.get():

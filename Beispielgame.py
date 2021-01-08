@@ -39,7 +39,14 @@ def textDisplay(text):
     pygame.display.update()
     time.sleep(1)
 
+def textDisplay2(text):
+    font = pygame.font.Font('comici.ttf', 70)
+    TextSurf, TextRect = textObjekt(text, font)
+    TextRect.center = ((screenBreite/2), (screenHoehe/2))
+    screen.blit(TextSurf, TextRect)
 
+    pygame.display.update()
+    time.sleep(1)
 
 # solange die Variable True ist, soll das Spiel laufen
 spielaktiv = True
@@ -70,7 +77,11 @@ eigenschaftenKleinVirus = {
 # Der Score wird aus einer Textdatei gelesen
 scoreDatei = open("Score.txt")
 highscore = scoreDatei.readline()
+highscore = highscore.strip()
+name = scoreDatei.readline()
 scoreDatei.close()
+
+
 
 # Dictionary fuer Virenkette
 # An jeweils der erste Stelle stehen die Elemente, die zu dem ersten Virus der Kette gehoeren, an der zweiten die vom zweiten...
@@ -157,7 +168,9 @@ randaktiv = True
 # Menue Logik, es wurde ein Library pygame_menu benutzt
 # https://pygame-menu.readthedocs.io/en/latest/index.html
 def name_aendern(wert):
-    print(wert)
+    global name
+    name = wert
+    return name
 
 def setze_schwierigkeitsgrad(wert, schwierigkeitsgrad):
     global schwierigkeitsgradAktiv
@@ -181,7 +194,7 @@ def spiel_starten():
 # Es wird ein Menue erstellt mit Groesse 300x600
 menu = pygame_menu.Menu(400, 600, 'Willkommen', theme=pygame_menu.themes.THEME_DARK)
 
-menu.add_text_input('Name: ', default='Max Weiss', onchange=name_aendern)
+menu.add_text_input('Name: ', default=name,maxchar=15, onchange=name_aendern)
 menu.add_selector('Schwierigkeitsgrad: ', [('Leicht', 1), ('Schwer', 2)], onchange=setze_schwierigkeitsgrad)
 menu.add_selector('Randuebergang: ', [('Aktiv', 1), ('Inaktiv', 2)], onchange=setze_rand)
 menu.add_button('Spielen', spiel_starten)
@@ -249,7 +262,7 @@ def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, mas
         eigenschaftenSpritze["SpritzeZaehler"] = 3999
         if not maskeAktiv:
             if schwierigkeitsgradAktiv:
-                gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, highscore, maskeAktiv)
+                highscore = gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, highscore, maskeAktiv, name)
             else:
                 hauptVirus["Laenge"] = int(hauptVirus["Laenge"]/2)
                 while hauptVirus["Laenge"] != len(virenKette["virenKetteZustand"]):
@@ -368,19 +381,22 @@ def zusatzObjektSpritze(eigenschaftenSpritze, x, y):
     eigenschaftenSpritze["SpritzeZaehler"] = z
     return eigenschaftenSpritze
 
-def gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, highscore, maskeAktiv):
+def gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, highscore, maskeAktiv, name):
     zustand = zustandsliste[4]
     # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
     # Score Update
     if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
         highscore = eigenschaftenHauptvirus["Laenge"]
-        textDisplay('New Highscore:' + 'Name ' + str(highscore))
+        textDisplay2('New Highscore:' + name + " " + str(highscore))
         scoreDatei = open("Score.txt", "w")
         highscore = scoreDatei.write(str(highscore))
+        scoreDatei.write("\n")
+        name = scoreDatei.write(name)
         scoreDatei.close()
 
         scoreDatei = open("Score.txt", "r")
         highscore = scoreDatei.readline()
+        highscore = highscore.strip()
         scoreDatei.close()
 
     else:
@@ -399,6 +415,10 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, high
     eigenschaftenMaske["MaskeZaehler"] = 4999
     eigenschaftenSpritze["SpritzeZaehler"] = 3999
     geschwindigkeit = 1
+
+    # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
+    time.sleep(2)
+    return highscore
 
 
 # Schleife Hauptprogramm
@@ -434,13 +454,13 @@ while spielaktiv:
         zustand = eigenschaftenHauptvirus["NaechsterZustand"]
 
 # Geschwindigkeitsanpassung
-        if eigenschaftenHauptvirus["Laenge"] >= 100:
+        if eigenschaftenHauptvirus["Laenge"] >= 0:
             geschwindigkeit = 10
-        elif eigenschaftenHauptvirus["Laenge"] >= 50:
+        elif eigenschaftenHauptvirus["Laenge"] >= 10:
             geschwindigkeit = 5
         elif eigenschaftenHauptvirus["Laenge"] >= 0:
             geschwindigkeit = 4
-        elif eigenschaftenHauptvirus["Laenge"] >= 5:
+        elif eigenschaftenHauptvirus["Laenge"] >= 10:
             geschwindigkeit = 2.5
         elif eigenschaftenHauptvirus["Laenge"] >= 1:
             geschwindigkeit = 2
@@ -539,39 +559,7 @@ while spielaktiv:
 
     # Zuruecksetzen aller Zustaende, wenn der Rand getroffen wurde
     elif zustand == zustandsliste[5]:
-        zustand = zustandsliste[4]
-    # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
-    # Score Update
-        if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
-            highscore = eigenschaftenHauptvirus["Laenge"]
-            textDisplay('New Highscore:' + 'Name ' + str(highscore))
-            scoreDatei = open("Score.txt", "w")
-            highscore = scoreDatei.write(str(highscore))
-            scoreDatei.close()
-
-            scoreDatei = open("Score.txt", "r")
-            highscore = scoreDatei.readline()
-            scoreDatei.close()
-
-        else:
-            textDisplay('GAME OVER')
-
-        eigenschaftenHauptvirus["PositionX"] = 606
-        eigenschaftenHauptvirus["PositionY"] = 406
-        eigenschaftenHauptvirus["Laenge"] = 0
-        virenKette["virenKettePositionX"] = []
-        virenKette["virenKettePositionY"] = []
-        virenKette["virenKetteZustand"] = []
-        virenKette["virenKetteBild"] = []
-        virenKette["NaechsterZustand"] = []
-        eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[4]
-        maskeAktiv = False
-        eigenschaftenMaske["MaskeZaehler"]=4999
-        eigenschaftenSpritze["SpritzeZaehler"]=3999
-        geschwindigkeit = 1
-
-    # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
-        time.sleep(1)
+        highscore = gameOver(zustand, eigenschaftenHauptvirus, virenKette, geschwindigkeit, highscore, maskeAktiv, name)
 
     # Virenkettepositionen aktualisieren, nachdem der Rand getroffen wurde
     if randaktiv:
@@ -702,10 +690,9 @@ while spielaktiv:
 
     # Textfeld zeichnen
     textfeldLaenge = schriftart.render('Laenge: ' + str(eigenschaftenHauptvirus["Laenge"]), False, (255, 255, 255))
-    textfeldHighscore = schriftart.render('Highscore: ' + highscore, False, (255, 255, 255))
+    textfeldHighscore = schriftart.render('Highscore: ' + str(highscore), False, (255, 255, 255))
     screen.blit(textfeldLaenge, (10, 0))
     screen.blit(textfeldHighscore, (980, 0))
-
     if maskeAktiv:
         textfeldMaske = schriftart.render("Schutzdauer: " + str((500-eigenschaftenMaske["maskeAktivZaehler"])/100), False, (255, 255, 255))
         screen.blit(textfeldMaske, (400,0))

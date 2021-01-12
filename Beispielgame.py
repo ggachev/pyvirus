@@ -454,18 +454,18 @@ while spielaktiv:
         zustand = eigenschaftenHauptvirus["NaechsterZustand"]
 
 # Geschwindigkeitsanpassung
-        if eigenschaftenHauptvirus["Laenge"] >= 0:
+        if eigenschaftenHauptvirus["Laenge"] >= 50:
             geschwindigkeit = 10
         elif eigenschaftenHauptvirus["Laenge"] >= 10:
             geschwindigkeit = 5
         elif eigenschaftenHauptvirus["Laenge"] >= 0:
             geschwindigkeit = 4
-        elif eigenschaftenHauptvirus["Laenge"] >= 10:
-            geschwindigkeit = 2.5
-        elif eigenschaftenHauptvirus["Laenge"] >= 1:
-            geschwindigkeit = 2
-        elif eigenschaftenHauptvirus["Laenge"] >= 0:
-            geschwindigkeit = 1
+        # elif eigenschaftenHauptvirus["Laenge"] >= 10:
+        #     geschwindigkeit = 2.5
+        # elif eigenschaftenHauptvirus["Laenge"] >= 1:
+        #     geschwindigkeit = 2
+        # elif eigenschaftenHauptvirus["Laenge"] >= 0:
+        #     geschwindigkeit = 1
         pixelaenderung = geschwindigkeit / 2
 
 # Aktualisieren des aktuellen Zustands und nächsten Zustands von der Viruskette alle 50 Pixel nach der Aenderung des Hauptvirus, aber vor der Bewegung
@@ -588,11 +588,11 @@ while spielaktiv:
     listenIndex = 0
     for position in virenKette["virenKettePositionX"]:
         if listenIndex >= 1 and zustand != zustandsliste[5]:
-            if not (eigenschaftenHauptvirus["PositionX"] >= virenKette["virenKettePositionX"][listenIndex] + 50 or
+            if not (eigenschaftenHauptvirus["PositionX"] >= virenKette["virenKettePositionX"][listenIndex] + 49 or
                     eigenschaftenHauptvirus["PositionX"] <= virenKette["virenKettePositionX"][
-                        listenIndex] - 50) and not (
-                    eigenschaftenHauptvirus["PositionY"] >= virenKette["virenKettePositionY"][listenIndex] + 50 or
-                    eigenschaftenHauptvirus["PositionY"] <= virenKette["virenKettePositionY"][listenIndex] - 50):
+                        listenIndex] - 49) and not (
+                    eigenschaftenHauptvirus["PositionY"] >= virenKette["virenKettePositionY"][listenIndex] + 49 or
+                    eigenschaftenHauptvirus["PositionY"] <= virenKette["virenKettePositionY"][listenIndex] - 49):
                 zustand = zustandsliste[5]
                 print(zustand)
         listenIndex += 1
@@ -694,10 +694,10 @@ while spielaktiv:
     screen.blit(textfeldLaenge, (10, 0))
     screen.blit(textfeldHighscore, (980, 0))
     if maskeAktiv:
-        textfeldMaske = schriftart.render("Schutzdauer: " + str((500-eigenschaftenMaske["maskeAktivZaehler"])/100), False, (255, 255, 255))
+        textfeldMaske = schriftart.render("Schutzdauer: " + str((1500-eigenschaftenMaske["maskeAktivZaehler"])/100), False, (255, 255, 255))
         screen.blit(textfeldMaske, (400,0))
         eigenschaftenMaske["maskeAktivZaehler"] += 1
-        if eigenschaftenMaske["maskeAktivZaehler"] == 500:
+        if eigenschaftenMaske["maskeAktivZaehler"] == 1500:
             eigenschaftenMaske["maskeAktivZaehler"] = 0
             maskeAktiv = False
 

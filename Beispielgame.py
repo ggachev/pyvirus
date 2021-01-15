@@ -200,10 +200,18 @@ def setze_rand(wert, x):
 def spiel_starten():
     menu.disable()
 
-HELP = "Press ESC to enable/disable Menu "\
-       "Press ENTER to access a Sub-Menu or use an option "\
-       "Press UP/DOWN to move through Menu "\
-       "Press LEFT/RIGHT to move through Selectors."
+# Liste, welche bei Submenue Hilfe angezeigt wird
+HELP = ['Druecken Sie ESC, um das Menü zu aktivieren / deaktivieren.',
+       'Ziel ist es moeglichst viele Viren einzusammeln.',
+       'Eine Spritze halbiert die Laenge im Modus leicht,',
+       'im Modus schwer fuehrt das zu Game Over.',
+       'Eine Maske schuetzt fuer eine gewisse Zeit vor einer Spritze.',
+       '']
+# Submenue Hilfe
+help_submenu = pygame_menu.Menu(400, 600, 'Hilfe', theme=pygame_menu.themes.THEME_DARK)
+for m in HELP:
+    help_submenu.add_label(m, align=pygame_menu.locals.ALIGN_LEFT, font_size=20)
+help_submenu.add_button('Zurueck', pygame_menu.events.RESET)
 
 # Es wird ein Menue erstellt mit Groesse 300x600
 menu = pygame_menu.Menu(400, 600, 'Willkommen', theme=pygame_menu.themes.THEME_DARK)
@@ -211,7 +219,7 @@ menu = pygame_menu.Menu(400, 600, 'Willkommen', theme=pygame_menu.themes.THEME_D
 menu.add_text_input('Name: ', default=name,maxchar=15, onchange=name_aendern)
 menu.add_selector('Schwierigkeitsgrad: ', [('Leicht', 1), ('Schwer', 2)], onchange=setze_schwierigkeitsgrad)
 menu.add_selector('Randuebergang: ', [('Aktiv', 1), ('Inaktiv', 2)], onchange=setze_rand)
-menu.add_label(HELP, max_char=-1, font_size=20)
+menu.add_button('Hilfe', help_submenu)
 menu.add_button('Spielen', spiel_starten)
 menu.add_button('Spiel beenden', pygame_menu.events.EXIT)
 # Das Menue wird hier zum Ersten mal gestartet
@@ -478,7 +486,6 @@ def gewinnPruefung(eigenschaftenHauptvirus, highscore):
     textDisplay3('DU HAST GEWONNEN!')
     time.sleep(2)
     highscore = gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv, name, eigenschaftenMaske, eigenschaftenSpritze)
-
     return highscore
 
 # Schleife Hauptprogramm
@@ -679,10 +686,6 @@ while spielaktiv:
             virenKette["virenKettePositionX"][virenIndex] += pixelaenderung
         virenIndex += 1
 
-
-
-
-
     # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
     for event in pygame.event.get():
         if event.type == pygame.locals.QUIT:
@@ -745,12 +748,17 @@ while spielaktiv:
     screen.blit(textfeldLaenge, (10, 0))
     screen.blit(textfeldHighscore, (980, 0))
     if maskeAktiv:
+        if eigenschaftenMaske["maskeAktivZaehler"] == 0:
+            hauptVirus = pygame.image.load('hauptvirus_maske.png')
+            hauptVirus = pygame.transform.scale(hauptVirus, (50, 50))
         textfeldMaske = schriftart.render("Schutzdauer: " + str((1500-eigenschaftenMaske["maskeAktivZaehler"])/100), False, (255, 255, 255))
         screen.blit(textfeldMaske, (400,0))
         eigenschaftenMaske["maskeAktivZaehler"] += 1
         if eigenschaftenMaske["maskeAktivZaehler"] == 1500:
             eigenschaftenMaske["maskeAktivZaehler"] = 0
             maskeAktiv = False
+            hauptVirus = pygame.image.load('rsz_kleineviren1.png')
+            hauptVirus = pygame.transform.scale(hauptVirus, (50, 50))
 
     # Randlinien zeichenen
     if randaktiv:

@@ -4,6 +4,7 @@ import time
 import pygame.locals
 # Um pygame menu zu installieren: python -m pip install pygame-menu
 import pygame_menu
+import pygame
 
 # Initialisieren von PyGame und Schrift
 pygame.init()
@@ -174,6 +175,9 @@ pixelaenderung = geschwindigkeit / 2
 # Variable um den Randuebergehen zu aktivieren bzw. deaktivieren
 randaktiv = True
 
+# Variable um den Ton zu aktivieren bzw. deaktivieren
+tonaktiv = True
+
 # Menue Logik, es wurde ein Library pygame_menu benutzt
 # https://pygame-menu.readthedocs.io/en/latest/index.html
 def name_aendern(wert):
@@ -200,6 +204,14 @@ def setze_rand(wert, x):
 def spiel_starten():
     menu.disable()
 
+def ton_setzen(wert, x):
+    global tonaktiv
+    if x == 1:
+        tonaktiv = True
+    if x == 2:
+        tonaktiv = False
+    return tonaktiv
+
 # Liste, welche bei Submenue Hilfe angezeigt wird
 HELP = ['Druecken Sie ESC, um das Menü zu aktivieren / deaktivieren.',
        'Ziel ist es moeglichst viele Viren einzusammeln.',
@@ -214,16 +226,23 @@ for m in HELP:
 help_submenu.add_button('Zurueck', pygame_menu.events.RESET)
 
 # Es wird ein Menue erstellt mit Groesse 300x600
-menu = pygame_menu.Menu(400, 600, 'Willkommen', theme=pygame_menu.themes.THEME_DARK)
+menu = pygame_menu.Menu(500, 600, 'Willkommen', theme=pygame_menu.themes.THEME_DARK)
 
 menu.add_text_input('Name: ', default=name,maxchar=15, onchange=name_aendern)
 menu.add_selector('Schwierigkeitsgrad: ', [('Leicht', 1), ('Schwer', 2)], onchange=setze_schwierigkeitsgrad)
 menu.add_selector('Randuebergang: ', [('Aktiv', 1), ('Inaktiv', 2)], onchange=setze_rand)
+menu.add_selector('Ton: ', [('An', 1), ('Aus', 2)], onchange=ton_setzen)
 menu.add_button('Hilfe', help_submenu)
 menu.add_button('Spielen', spiel_starten)
 menu.add_button('Spiel beenden', pygame_menu.events.EXIT)
 # Das Menue wird hier zum Ersten mal gestartet
-menu.mainloop(screen)
+
+# Idee von pygame_menu Dokumentation
+def menu_background():
+    global screen
+    screen.blit(hauptVirus, (0, 0))
+
+menu.mainloop(screen, menu_background)
 
 # Kollisionspruefung
 # Zunaechst wird geprueft ob eine Kollision mit einem kleinen Virus stattfindet, wenn das der Fall ist wird berechnet an
@@ -271,6 +290,11 @@ def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePos
 # Das Bild von dem erstellten klein Virus wird zur Liste mit den Bildern hinzugefuegt
         virenKetteBild.append(kleinVirus["Bild"])
         hauptVirus["Laenge"] += 1
+
+# Sound abspielen
+# Idee https://nerdparadise.com/programming/pygame/part3
+        pygame.mixer.music.load('Sound_Virus.mp3')
+        pygame.mixer.music.play()
 
         if eigenschaftenHauptvirus["Laenge"] == 383:
             highscore = gewinnPruefung(eigenschaftenHauptvirus, highscore)

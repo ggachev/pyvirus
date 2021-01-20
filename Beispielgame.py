@@ -91,7 +91,13 @@ highscore = highscore.strip()
 name = scoreDatei.readline()
 scoreDatei.close()
 
+# Hintergrundbild:
+hintergrund = pygame.image.load('background_bild.png')
 
+#Hintergrundmusik und Toene:
+backgroundSound = pygame.mixer.Sound('Sound_Background.mp3')
+gameOverSound = pygame.mixer.Sound('Sound_GameOver.wav')
+gewonnenSound = pygame.mixer.Sound('Sound_Gewonnen.mp3')
 
 # Dictionary fuer Virenkette
 # An jeweils der erste Stelle stehen die Elemente, die zu dem ersten Virus der Kette gehoeren, an der zweiten die vom zweiten...
@@ -202,7 +208,18 @@ def setze_rand(wert, x):
     return randaktiv
 
 def spiel_starten():
+    global tonaktiv
+    global backgroundSound
     menu.disable()
+    # Sound abspielen
+    # Ton: https://www.musicfox.com/info/kostenlose-gemafreie-musik.php
+
+    if tonaktiv:
+        backgroundSound.set_volume(0.6)
+        backgroundSound.play(-1)
+    else:
+        backgroundSound.stop()
+
 
 def ton_setzen(wert, x):
     global tonaktiv
@@ -240,9 +257,10 @@ menu.add_button('Spiel beenden', pygame_menu.events.EXIT)
 # Idee von pygame_menu Dokumentation
 def menu_background():
     global screen
-    screen.blit(hauptVirus, (0, 0))
+    screen.blit(hintergrund, (0, 0))
 
 menu.mainloop(screen, menu_background)
+
 
 # Kollisionspruefung
 # Zunaechst wird geprueft ob eine Kollision mit einem kleinen Virus stattfindet, wenn das der Fall ist wird berechnet an
@@ -293,8 +311,10 @@ def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePos
 
 # Sound abspielen
 # Idee https://nerdparadise.com/programming/pygame/part3
-        pygame.mixer.music.load('Sound_Virus.mp3')
-        pygame.mixer.music.play()
+# Ton: https://www.salamisound.de
+        if tonaktiv:
+            pygame.mixer.music.load('Sound_Viren.mp3')
+            pygame.mixer.music.play()
 
         if eigenschaftenHauptvirus["Laenge"] == 383:
             highscore = gewinnPruefung(eigenschaftenHauptvirus, highscore)
@@ -306,11 +326,25 @@ def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
         eigenschaftenMaske["MaskeZaehler"] = 0
         maskeAktiv = True
         eigenschaftenMaske["PositionX"] = -1
+
+        # Sound abspielen
+        # Ton: https://www.salamisound.de
+        if tonaktiv:
+            pygame.mixer.music.load('Sound_Maske.mp3')
+            pygame.mixer.music.play()
+
     return maskeAktiv
 
 def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette, zustand, schwierigkeitsgradAktiv, highscore):
     if not (hauptVirus["PositionX"] >= eigenschaftenSpritze["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenSpritze["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenSpritze["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenSpritze["PositionY"] - 50):
         eigenschaftenSpritze["SpritzeZaehler"] = 3999
+
+        # Sound abspielen
+        # Ton: https://www.salamisound.de
+        if tonaktiv and not maskeAktiv:
+            pygame.mixer.music.load('Sound_Spritze.mp3')
+            pygame.mixer.music.play()
+
         if not maskeAktiv:
             if schwierigkeitsgradAktiv:
                 highscore = gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv, name, eigenschaftenMaske, eigenschaftenSpritze)
@@ -472,6 +506,13 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
     # Score Update
 
     if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
+        # Sound abspielen
+        # Ton: https://www.youtube.com/watch?v=xP1b_uRx5x4
+        if tonaktiv:
+            backgroundSound.stop()
+            gewonnenSound.play()
+
+
         highscore = eigenschaftenHauptvirus["Laenge"]
         textDisplay2('New Highscore: ' + name + " " + str(highscore))
         scoreDatei = open("Score.txt", "w")
@@ -485,8 +526,17 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
         highscore = highscore.strip()
         scoreDatei.close()
 
+
+
     else:
+        # Sound abspielen
+        # Ton: https://mixkit.co/free-sound-effects/game-over/
+        if tonaktiv:
+            backgroundSound.stop()
+            gameOverSound.play()
         textDisplay('GAME OVER!')
+
+
 
     eigenschaftenHauptvirus["PositionX"] = 606
     eigenschaftenHauptvirus["PositionY"] = 406
@@ -502,7 +552,8 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
     eigenschaftenSpritze["SpritzeZaehler"] = 3999
 
     # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
-    time.sleep(2)
+    time.sleep(5)
+    backgroundSound.play(-1)
     return highscore
 
 def gewinnPruefung(eigenschaftenHauptvirus, highscore):
@@ -514,6 +565,8 @@ def gewinnPruefung(eigenschaftenHauptvirus, highscore):
 
 # Schleife Hauptprogramm
 while spielaktiv:
+
+
 
     # Aktualisieren des Zustands vom Hauptvirus
     # Es wird gepruft, ob der Zustand nicht Gameover ist und eine Pfeiltaste gedrueckt wird

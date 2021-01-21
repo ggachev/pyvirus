@@ -325,7 +325,7 @@ def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
     if not (hauptVirus["PositionX"] >= eigenschaftenMaske["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenMaske["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenMaske["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenMaske["PositionY"] - 50):
         eigenschaftenMaske["MaskeZaehler"] = 0
         maskeAktiv = True
-        eigenschaftenMaske["PositionX"] = -1
+        eigenschaftenMaske["PositionX"] = -105
 
         # Sound abspielen
         # Ton: https://www.salamisound.de
@@ -504,7 +504,6 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
     zustand = zustandsliste[4]
     # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
     # Score Update
-
     if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
         # Sound abspielen
         # Ton: https://www.youtube.com/watch?v=xP1b_uRx5x4
@@ -553,7 +552,8 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
 
     # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
     time.sleep(5)
-    backgroundSound.play(-1)
+    if tonaktiv:
+        backgroundSound.play(-1)
     return highscore
 
 def gewinnPruefung(eigenschaftenHauptvirus, highscore):

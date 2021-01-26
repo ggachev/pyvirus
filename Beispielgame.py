@@ -566,8 +566,6 @@ def gewinnPruefung(eigenschaftenHauptvirus, highscore):
 # Schleife Hauptprogramm
 while spielaktiv:
 
-
-
     # Aktualisieren des Zustands vom Hauptvirus
     # Es wird gepruft, ob der Zustand nicht Gameover ist und eine Pfeiltaste gedrueckt wird
     if zustand != zustandsliste[5]:
@@ -724,13 +722,27 @@ while spielaktiv:
     listenIndex = 0
     for position in virenKette["virenKettePositionX"]:
         if listenIndex >= 1 and zustand != zustandsliste[5]:
-            if not (eigenschaftenHauptvirus["PositionX"] >= virenKette["virenKettePositionX"][listenIndex] + 49 or
-                    eigenschaftenHauptvirus["PositionX"] <= virenKette["virenKettePositionX"][
-                        listenIndex] - 49) and not (
-                    eigenschaftenHauptvirus["PositionY"] >= virenKette["virenKettePositionY"][listenIndex] + 49 or
-                    eigenschaftenHauptvirus["PositionY"] <= virenKette["virenKettePositionY"][listenIndex] - 49):
+            if (virenKette["virenKettePositionX"][listenIndex] + 49 > eigenschaftenHauptvirus["PositionX"] >
+                virenKette["virenKettePositionX"][listenIndex] - 49) and(
+                    virenKette["virenKettePositionY"][listenIndex] + 49 > eigenschaftenHauptvirus["PositionY"] >
+                    virenKette["virenKettePositionY"][listenIndex] - 49):
                 zustand = zustandsliste[5]
         listenIndex += 1
+
+    # Bewegung der Viruskette
+    # Logik ist analog zu Hauptvirus
+    # Verzoegerung mit Hilfe des Zustandsspeichers
+    virenIndex = 0
+    for zustandKette in virenKette["virenKetteZustand"]:
+        if zustandKette == "Oben":
+            virenKette["virenKettePositionY"][virenIndex] -= pixelaenderung
+        elif zustandKette == "Unten":
+            virenKette["virenKettePositionY"][virenIndex] += pixelaenderung
+        elif zustandKette == "Links":
+            virenKette["virenKettePositionX"][virenIndex] -= pixelaenderung
+        elif zustandKette == "Rechts":
+            virenKette["virenKettePositionX"][virenIndex] += pixelaenderung
+        virenIndex += 1
 
     # Spiellogik ist hier integriert
     if zustand != "Nichts" and zustand != "Gameover":
@@ -747,21 +759,6 @@ while spielaktiv:
                                               eigenschaftenHauptvirus["PositionY"], eigenschaftenHauptvirus, eigenschaftenKleinVirus, virenKette, eigenschaftenMaske)
         maskeAktiv = collisionPruefungMaske(eigenschaftenHauptvirus, eigenschaftenMaske, maskeAktiv)
         spritzeAktiv = collisionPruefungSpritze(eigenschaftenHauptvirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette, zustand, schwierigkeitsgradAktiv, highscore)
-
-    # Bewegung der Viruskette
-    # Logik ist analog zu Hauptvirus
-    # Verzoegerung mit Hilfe des Zustandsspeichers
-    virenIndex = 0
-    for zustandKette in virenKette["virenKetteZustand"]:
-        if zustandKette == "Oben":
-            virenKette["virenKettePositionY"][virenIndex] -= pixelaenderung
-        elif zustandKette == "Unten":
-            virenKette["virenKettePositionY"][virenIndex] += pixelaenderung
-        elif zustandKette == "Links":
-            virenKette["virenKettePositionX"][virenIndex] -= pixelaenderung
-        elif zustandKette == "Rechts":
-            virenKette["virenKettePositionX"][virenIndex] += pixelaenderung
-        virenIndex += 1
 
     # Überprüfen, ob Nutzer eine Aktion durchgeführt hat
     for event in pygame.event.get():

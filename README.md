@@ -1,7 +1,7 @@
 # PyVirus
-Projekt in Informatikwerstatt
-
-Das ist unser Projekt und wir werden ein Spiel mit der Name PyVirus porgrammieren.
+Projekt in Informatikwerstatt - Anwendungsentwicklung
+Gruppe 5
+Silvia, Anastasia, Karla, Gabriel
 
 Verlauf:
 25.11.2020 - Objekt startet in der Mitte und kann sich bis zur Rand bewegen.
@@ -33,3 +33,29 @@ Verlauf:
 17.12.2020 - Funktion kleineViren angepasst nach der Erweiterung; Textfelder hinzugefuegt
 
 18.12.2020 - Versuch die Geschwindigkeitsanpassung zu optimieren; leider besteht das Problem immernoch, dass bei Aenderung der Geschwindigkeit manchmal sich die kleine Viren nicht an die Richtige Postition spawnen bzw. nicht in die richtige Richtung fuer X Schritte laufen
+
+22.12.2020 - Ein Grundspiel ohne bekannte Fehler wurde erstellt. Damit können wir über das Ferien unsere Funktionen entwickeln. Silvi - Highscore Datei; Karla - Geschwindigkeitsanpassung; Nasti - Maske und Spritze; Gabriel - Randübergang mit Menue
+
+06.01.2021 - Versuch alles zusammenzufassen, was wir entwickelt haben. Alles wurde zusammengeaffst, außer die Funktionen von Silvi.
+
+07.01.2021 - Alles wurde zusammengefügt; Bugs wurde beseitigt sowie einen mit dem Rand
+
+08.01.2021 - Namen werden in der Highscoredatei gespeichert
+
+10.01.2021 - Weitere bugs wurden beseitigt
+
+13.01.2021 - Es gibt neue Funktion, gewinnPruefung
+
+14.01.2021 - Hauptvirus ist jetzt mit Maske als Bild, wenn man die Maske sammelt und die Viren drehen sich entsprechend der Richtung
+
+15.01.2021 - Es wurden weitere Bugs und Anpassungen beseitigt/vorgenommen
+
+19.01.2021 - Es wurden Sounds hinzugefügt
+
+20.01.2021 - Hintergrundbild wurde von Silvi erstellt und hinzugefügt
+
+21.01.2021 - Bugs mit Ton und Maske wurden behoben
+
+26.01.2021 - Bug mit der Kollisiionsprüfung wurde beseitigt indem die Virenkettebewebung vor der Kollisionsprüfung stattfindet
+
+27.01.2021 - Funktionen um Texte auszugeben wurden komprimiert. Weiterhin wurde der Code kommentiert.

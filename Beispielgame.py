@@ -26,37 +26,23 @@ pygame.display.set_caption('PyVirus')
 clock = pygame.time.Clock()
 
 #Quelle:https://pythonprogramming.net/displaying-text-pygame-screen/
-#Text nach Game
+#Funktion um Texte zu zeichnen
 def textObjekt(text, font):
     textSurface = font.render(text, True, (255, 255, 255))
     return textSurface, textSurface.get_rect()
-
-def textDisplay(text):
-    font = pygame.font.Font('comici.ttf', 90)
+# Die FUnktion nimmt als Parameter: Text, Schriftgroesse, Breite/X-Koordinaten/, Hoehe/Y-Koordinaten/, Timer/Spiel anhalten. Boolean/, Center/Text zentrieren, Boolean/
+def textDisplay(text, schriftgroesse, Breite, Hoehe, Timer, Center):
+    font = pygame.font.Font('comici.ttf', schriftgroesse)
     TextSurf, TextRect = textObjekt(text, font)
-    TextRect.center = ((screenBreite/2), (screenHoehe/2))
+    if Center:
+        TextRect.center = (Breite, Hoehe)
+    else:
+        TextRect.x = Breite
+        TextRect.y = Hoehe
     screen.blit(TextSurf, TextRect)
-
-    pygame.display.update()
-    time.sleep(1)
-
-def textDisplay2(text):
-    font = pygame.font.Font('comici.ttf', 70)
-    TextSurf, TextRect = textObjekt(text, font)
-    TextRect.center = ((screenBreite/2), (screenHoehe/2))
-    screen.blit(TextSurf, TextRect)
-
-    pygame.display.update()
-    time.sleep(1)
-
-def textDisplay3(text):
-    font = pygame.font.Font('comici.ttf', 70)
-    TextSurf, TextRect = textObjekt(text, font)
-    TextRect.center = ((screenBreite / 2), (screenHoehe / 2)-70)
-    screen.blit(TextSurf, TextRect)
-
-    pygame.display.update()
-    time.sleep(1)
+    if Timer:
+        pygame.display.update()
+        time.sleep(1)
 
 # solange die Variable True ist, soll das Spiel laufen
 spielaktiv = True
@@ -130,7 +116,7 @@ virusGrau = pygame.image.load('rsz_kleineviren9.png')
 virusBilderold = [virusRot, virusOrange, virusGelb, virusGruen, virusBlau, virusLila, virusPink, virusGrau]
 virusBilder = []
 
-# Virenbilder auf 50x50 verkleinern
+# Virenbilder auf 50x50 verkleinern und in der Liste virusBilder Speichern
 for Bild in virusBilderold:
     Bild = pygame.transform.scale(Bild, (50, 50))
     virusBilder.append(Bild)
@@ -183,84 +169,6 @@ randaktiv = True
 
 # Variable um den Ton zu aktivieren bzw. deaktivieren
 tonaktiv = True
-
-# Menue Logik, es wurde ein Library pygame_menu benutzt
-# https://pygame-menu.readthedocs.io/en/latest/index.html
-def name_aendern(wert):
-    global name
-    name = wert
-    return name
-
-def setze_schwierigkeitsgrad(wert, schwierigkeitsgrad):
-    global schwierigkeitsgradAktiv
-    if schwierigkeitsgrad == 1:
-        schwierigkeitsgradAktiv = False
-    if schwierigkeitsgrad == 2:
-        schwierigkeitsgradAktiv = True
-    return schwierigkeitsgradAktiv
-
-def setze_rand(wert, x):
-    global randaktiv
-    if x == 1:
-        randaktiv = True
-    if x == 2:
-        randaktiv = False
-    return randaktiv
-
-def spiel_starten():
-    global tonaktiv
-    global backgroundSound
-    menu.disable()
-    # Sound abspielen
-    # Ton: https://www.musicfox.com/info/kostenlose-gemafreie-musik.php
-
-    if tonaktiv:
-        backgroundSound.set_volume(0.6)
-        backgroundSound.play(-1)
-    else:
-        backgroundSound.stop()
-
-
-def ton_setzen(wert, x):
-    global tonaktiv
-    if x == 1:
-        tonaktiv = True
-    if x == 2:
-        tonaktiv = False
-    return tonaktiv
-
-# Liste, welche bei Submenue Hilfe angezeigt wird
-HELP = ['Druecken Sie ESC, um das Menü zu aktivieren / deaktivieren.',
-       'Ziel ist es moeglichst viele Viren einzusammeln.',
-       'Eine Spritze halbiert die Laenge im Modus leicht,',
-       'im Modus schwer fuehrt das zu Game Over.',
-       'Eine Maske schuetzt fuer eine gewisse Zeit vor einer Spritze.',
-       '']
-# Submenue Hilfe
-help_submenu = pygame_menu.Menu(400, 600, 'Hilfe', theme=pygame_menu.themes.THEME_DARK)
-for m in HELP:
-    help_submenu.add_label(m, align=pygame_menu.locals.ALIGN_LEFT, font_size=20)
-help_submenu.add_button('Zurueck', pygame_menu.events.RESET)
-
-# Es wird ein Menue erstellt mit Groesse 300x600
-menu = pygame_menu.Menu(500, 600, 'Willkommen', theme=pygame_menu.themes.THEME_DARK)
-
-menu.add_text_input('Name: ', default=name,maxchar=15, onchange=name_aendern)
-menu.add_selector('Schwierigkeitsgrad: ', [('Leicht', 1), ('Schwer', 2)], onchange=setze_schwierigkeitsgrad)
-menu.add_selector('Randuebergang: ', [('Aktiv', 1), ('Inaktiv', 2)], onchange=setze_rand)
-menu.add_selector('Ton: ', [('An', 1), ('Aus', 2)], onchange=ton_setzen)
-menu.add_button('Hilfe', help_submenu)
-menu.add_button('Spielen', spiel_starten)
-menu.add_button('Spiel beenden', pygame_menu.events.EXIT)
-# Das Menue wird hier zum Ersten mal gestartet
-
-# Idee von pygame_menu Dokumentation
-def menu_background():
-    global screen
-    screen.blit(hintergrund, (0, 0))
-
-menu.mainloop(screen, menu_background)
-
 
 # Kollisionspruefung
 # Zunaechst wird geprueft ob eine Kollision mit einem kleinen Virus stattfindet, wenn das der Fall ist wird berechnet an
@@ -316,11 +224,12 @@ def collisionPruefung(hauptVirus, kleinVirus, virenKettePositionX, virenKettePos
             pygame.mixer.music.load('Sound_Viren.mp3')
             pygame.mixer.music.play()
 
+# Wenn eine Laenge von 383 erreicht wurde, hat man gewonnen
         if eigenschaftenHauptvirus["Laenge"] == 383:
-            highscore = gewinnPruefung(eigenschaftenHauptvirus, highscore)
+            highscore = gewinn(eigenschaftenHauptvirus, highscore)
     return highscore
 
-# Zunaechst wird geprueft ob eine Kollision mit der Maske/ Spritze stattfindet
+# Hier wird geprueft ob eine Kollision mit der Maske stattfindet
 def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
     if not (hauptVirus["PositionX"] >= eigenschaftenMaske["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenMaske["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenMaske["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenMaske["PositionY"] - 50):
         eigenschaftenMaske["MaskeZaehler"] = 0
@@ -335,6 +244,7 @@ def collisionPruefungMaske(hauptVirus, eigenschaftenMaske, maskeAktiv):
 
     return maskeAktiv
 
+# Hier wird geprueft ob eine Kollision mit der Spritze stattfindet
 def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, maskeAktiv, virenKette, zustand, schwierigkeitsgradAktiv, highscore):
     if not (hauptVirus["PositionX"] >= eigenschaftenSpritze["PositionX"] + 50 or hauptVirus["PositionX"] <= eigenschaftenSpritze["PositionX"] - 50) and not (hauptVirus["PositionY"] >= eigenschaftenSpritze["PositionY"] + 50 or hauptVirus["PositionY"] <= eigenschaftenSpritze["PositionY"] - 50):
         eigenschaftenSpritze["SpritzeZaehler"] = 3999
@@ -345,6 +255,9 @@ def collisionPruefungSpritze(hauptVirus, eigenschaftenSpritze, spritzeAktiv, mas
             pygame.mixer.music.load('Sound_Spritze.mp3')
             pygame.mixer.music.play()
 
+# Hier wird geprueft, ob die Maske nicht aktiv ist und ob der Schwierigkeitsgrad auf schwer ist
+# Bei schwer - Gameover
+# Ansonsten - die Laenge wird halbiert
         if not maskeAktiv:
             if schwierigkeitsgradAktiv:
                 highscore = gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv, name, eigenschaftenMaske, eigenschaftenSpritze)
@@ -368,7 +281,7 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette, eigensch
     z += 1
 
     if z == 2000:
-        # Es wird geprueft, ob das Bild gleich wie das vorherige ist und wenn das der Fall ist, wird neues Bild zufaellig erstellt
+# Es wird geprueft, ob das Bild gleich wie das vorherige ist und wenn das der Fall ist, wird neues Bild zufaellig erstellt
         virenbildgleich = True
 
         while virenbildgleich:
@@ -378,7 +291,7 @@ def kleineViren(x, y, eigenschaftenKleinVirus, virusBilder, virenKette, eigensch
                 virenbildgleich = False
         eigenschaftenKleinVirus["Bild"] = randomvirus
 
-        # Kollisionspruefung und Erstellungs die neue Koordinaten fuer kleinVirus
+# Kollisionspruefung und Erstellungs die neue Koordinaten fuer kleinVirus
         position = False
 
         while not position:
@@ -513,7 +426,7 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
 
 
         highscore = eigenschaftenHauptvirus["Laenge"]
-        textDisplay2('New Highscore: ' + name + " " + str(highscore))
+        textDisplay('New Highscore: ' + name + " " + str(highscore), 70, (screenBreite/2), (screenHoehe/2), True, True)
         scoreDatei = open("Score.txt", "w")
         highscore = scoreDatei.write(str(highscore))
         scoreDatei.write("\n")
@@ -525,15 +438,13 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
         highscore = highscore.strip()
         scoreDatei.close()
 
-
-
     else:
         # Sound abspielen
         # Ton: https://mixkit.co/free-sound-effects/game-over/
         if tonaktiv:
             backgroundSound.stop()
             gameOverSound.play()
-        textDisplay('GAME OVER!')
+        textDisplay('GAME OVER!', 90, (screenBreite/2), (screenHoehe/2), True, True)
 
 
 
@@ -556,12 +467,89 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
         backgroundSound.play(-1)
     return highscore
 
-def gewinnPruefung(eigenschaftenHauptvirus, highscore):
+def gewinn(eigenschaftenHauptvirus, highscore):
     highscore = 1
-    textDisplay3('DU HAST GEWONNEN!')
+    textDisplay('DU HAST GEWONNEN!', 70, (screenBreite/2), (screenHoehe/2)-70, True, True)
     time.sleep(2)
     highscore = gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv, name, eigenschaftenMaske, eigenschaftenSpritze)
     return highscore
+
+# Menue Logik, es wurde ein Library pygame_menu benutzt
+# https://pygame-menu.readthedocs.io/en/latest/index.html
+# Idee von pygame_menu Dokumentation
+def menu_background():
+    global screen
+    screen.blit(hintergrund, (0, 0))
+
+def name_aendern(wert):
+    global name
+    name = wert
+    return name
+
+def setze_schwierigkeitsgrad(wert, schwierigkeitsgrad):
+    global schwierigkeitsgradAktiv
+    if schwierigkeitsgrad == 1:
+        schwierigkeitsgradAktiv = False
+    if schwierigkeitsgrad == 2:
+        schwierigkeitsgradAktiv = True
+    return schwierigkeitsgradAktiv
+
+def setze_rand(wert, x):
+    global randaktiv
+    if x == 1:
+        randaktiv = True
+    if x == 2:
+        randaktiv = False
+    return randaktiv
+
+def spiel_starten():
+    global tonaktiv
+    global backgroundSound
+    menu.disable()
+
+    # Sound abspielen
+    # Ton: https://www.musicfox.com/info/kostenlose-gemafreie-musik.php
+    if tonaktiv:
+        backgroundSound.set_volume(0.6)
+        backgroundSound.play(-1)
+    else:
+        backgroundSound.stop()
+
+def ton_setzen(wert, x):
+    global tonaktiv
+    if x == 1:
+        tonaktiv = True
+    if x == 2:
+        tonaktiv = False
+    return tonaktiv
+
+# Liste, welche bei Submenue Hilfe angezeigt wird
+HELP = ['Drücken Sie ESC, um das Menü zu aktivieren / deaktivieren.',
+       'Ziel ist es möglichst viele Viren einzusammeln.',
+       'Eine Spritze halbiert die Länge im Modus leicht,',
+       'im Modus schwer führt das zu Game Over.',
+       'Eine Maske schützt für eine gewisse Zeit vor einer Spritze.',
+       '']
+# Submenue Hilfe
+help_submenu = pygame_menu.Menu(400, 600, 'Hilfe', theme=pygame_menu.themes.THEME_DARK)
+for m in HELP:
+    help_submenu.add_label(m, align=pygame_menu.locals.ALIGN_LEFT, font_size=20)
+help_submenu.add_button('Zurück', pygame_menu.events.RESET)
+
+# Es wird ein Menue erstellt mit Groesse 300x600
+menu = pygame_menu.Menu(500, 600, 'Willkommen', theme=pygame_menu.themes.THEME_DARK)
+
+#Hauptmenueelemente
+menu.add_text_input('Name: ', default=name,maxchar=15, onchange=name_aendern)
+menu.add_selector('Schwierigkeitsgrad: ', [('Leicht', 1), ('Schwer', 2)], onchange=setze_schwierigkeitsgrad)
+menu.add_selector('Randuebergang: ', [('Aktiv', 1), ('Inaktiv', 2)], onchange=setze_rand)
+menu.add_selector('Ton: ', [('An', 1), ('Aus', 2)], onchange=ton_setzen)
+menu.add_button('Hilfe', help_submenu)
+menu.add_button('Spielen', spiel_starten)
+menu.add_button('Spiel beenden', pygame_menu.events.EXIT)
+
+# Das Menue wird hier zum Ersten mal gestartet
+menu.mainloop(screen, menu_background)
 
 # Schleife Hauptprogramm
 while spielaktiv:
@@ -816,23 +804,26 @@ while spielaktiv:
     if not spritzeAktiv and zustand != "Nichts" and zustand != "Gameover":
         screen.blit(eigenschaftenSpritze["Bild"], (eigenschaftenSpritze["PositionX"], eigenschaftenSpritze["PositionY"]))
 
-    # Textfeld zeichnen
-    textfeldLaenge = schriftart.render('Laenge: ' + str(eigenschaftenHauptvirus["Laenge"]), False, (255, 255, 255))
-    textfeldHighscore = schriftart.render('Highscore: ' + str(highscore), False, (255, 255, 255))
-    screen.blit(textfeldLaenge, (10, 0))
-    screen.blit(textfeldHighscore, (980, 0))
+    # Textfelder fuer Laenge und Highscore zeichnen
+    textDisplay('Laenge: ' + str(eigenschaftenHauptvirus["Laenge"]), 30, 80, 20, False, True)
+    textDisplay('Highscore: ' + str(highscore), 30, screenBreite-130, 20, False, True)
+
     if maskeAktiv:
         if eigenschaftenMaske["maskeAktivZaehler"] == 0:
             hauptVirus = pygame.image.load('hauptvirus_maske.png')
             hauptVirus = pygame.transform.scale(hauptVirus, (50, 50))
-        textfeldMaske = schriftart.render("Schutzdauer: " + str((1500-eigenschaftenMaske["maskeAktivZaehler"])/100), False, (255, 255, 255))
-        screen.blit(textfeldMaske, (400,0))
+
+        textDisplay("Schutzdauer: " + str((1500-eigenschaftenMaske["maskeAktivZaehler"])/100), 30, 450, 0, False, False)
+
         eigenschaftenMaske["maskeAktivZaehler"] += 1
         if eigenschaftenMaske["maskeAktivZaehler"] == 1500:
             eigenschaftenMaske["maskeAktivZaehler"] = 0
             maskeAktiv = False
             hauptVirus = pygame.image.load('rsz_kleineviren1.png')
             hauptVirus = pygame.transform.scale(hauptVirus, (50, 50))
+
+    if eigenschaftenHauptvirus["Laenge"] == 49:
+        textDisplay('ACHTUNG! Gleich steigt die Geschwindigkeit!', 40, (screenBreite/2), (screenHoehe-70), False, True)
 
     # Randlinien zeichenen
     if randaktiv:

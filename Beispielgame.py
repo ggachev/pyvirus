@@ -413,18 +413,19 @@ def zusatzObjektSpritze(eigenschaftenSpritze, x, y, eigenschaftenHauptvirus, eig
         eigenschaftenSpritze["SpritzeZaehler"] = z
     return eigenschaftenSpritze
 
+#Diese Funktion wird ausgeführt, wenn man das Spiel verloren hat
 def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv, name, eigenschaftenMaske, eigenschaftenSpritze):
     zustand = zustandsliste[4]
     # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
     # Score Update
-    if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
-        # Sound abspielen
+    if int(eigenschaftenHauptvirus["Laenge"]) >= int(highscore):
+        # Sound abspielen, gewonnen
         # Ton: https://www.youtube.com/watch?v=xP1b_uRx5x4
         if tonaktiv:
             backgroundSound.stop()
             gewonnenSound.play()
 
-
+        #Neuen Highscore wird gleich die Laenge, ausgegeben und in der Datei gespeichert
         highscore = eigenschaftenHauptvirus["Laenge"]
         textDisplay('New Highscore: ' + name + " " + str(highscore), 70, (screenBreite/2), (screenHoehe/2), True, True)
         scoreDatei = open("Score.txt", "w")
@@ -439,7 +440,7 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
         scoreDatei.close()
 
     else:
-        # Sound abspielen
+        # Sound abspielen, verloren
         # Ton: https://mixkit.co/free-sound-effects/game-over/
         if tonaktiv:
             backgroundSound.stop()
@@ -447,7 +448,7 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
         textDisplay('GAME OVER!', 90, (screenBreite/2), (screenHoehe/2), True, True)
 
 
-
+    #Alle Variablen zurücksetzen
     eigenschaftenHauptvirus["PositionX"] = 606
     eigenschaftenHauptvirus["PositionY"] = 406
     eigenschaftenHauptvirus["Laenge"] = 0
@@ -463,12 +464,13 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv
 
     # Idee von: https://docs.python.org/3/library/time.html?highlight=time%20sleep#time.sleep
     time.sleep(5)
+    #Wenn der Ton aktiv ist, wird der Backgroundsound wieder gestartet
     if tonaktiv:
         backgroundSound.play(-1)
     return highscore
 
+#Diese Funktion wird ausgeführt, wenn man gewonnen hat
 def gewinn(eigenschaftenHauptvirus, highscore):
-    highscore = 1
     textDisplay('DU HAST GEWONNEN!', 70, (screenBreite/2), (screenHoehe/2)-70, True, True)
     time.sleep(2)
     highscore = gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, maskeAktiv, name, eigenschaftenMaske, eigenschaftenSpritze)
@@ -579,7 +581,6 @@ while spielaktiv:
                 eigenschaftenHauptvirus["NaechsterZustand"] = zustandsliste[1]
 
 # Alle 50 Pixel die Richtung wechseln
-
     if eigenschaftenHauptvirus["PositionX"] % 50 == 6 and eigenschaftenHauptvirus["PositionY"] % 50 == 6:
         zustand = eigenschaftenHauptvirus["NaechsterZustand"]
 
@@ -590,12 +591,15 @@ while spielaktiv:
             geschwindigkeit = 5
         elif eigenschaftenHauptvirus["Laenge"] >= 0:
             geschwindigkeit = 4
+        
+        # Weitere Moeglichkeit fuer die Geschwindigkeit:
         # elif eigenschaftenHauptvirus["Laenge"] >= 10:
         #     geschwindigkeit = 2.5
         # elif eigenschaftenHauptvirus["Laenge"] >= 1:
         #     geschwindigkeit = 2
         # elif eigenschaftenHauptvirus["Laenge"] >= 0:
         #     geschwindigkeit = 1
+
         pixelaenderung = geschwindigkeit / 2
 
 # Aktualisieren des aktuellen Zustands und nächsten Zustands von der Viruskette alle 50 Pixel nach der Aenderung des Hauptvirus, aber vor der Bewegung
@@ -619,7 +623,7 @@ while spielaktiv:
         if randaktiv:
             if eigenschaftenHauptvirus["PositionY"] > 5 or (
                     eigenschaftenHauptvirus["PositionX"] > 755 and eigenschaftenHauptvirus[
-                "PositionX"] < 807):  # > 5 wegen dem Rand
+                "PositionX"] < 807):  # > 7 wegen dem Rand
                 eigenschaftenHauptvirus["PositionY"] -= pixelaenderung
                 if eigenschaftenHauptvirus["PositionY"] < -(44-pixelaenderung):
                     eigenschaftenHauptvirus["PositionX"] = 256

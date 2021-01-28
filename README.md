@@ -59,3 +59,5 @@ Verlauf:
 26.01.2021 - Bug mit der Kollisiionsprüfung wurde beseitigt indem die Virenkettebewebung vor der Kollisionsprüfung stattfindet
 
 27.01.2021 - Funktionen um Texte auszugeben wurden komprimiert. Weiterhin wurde der Code kommentiert.
+
+28.01.2021 - Randuebergang wurde so gemacht, dass wenn z.B. der Virus von unten bzw. von rechts reingehet auch von unten bzw. von rechts rauskommt. Das ermoeglich ein Loch zweimal gleichzeitig zu benutzen. Kommentare wurden hinzugefuegt. 

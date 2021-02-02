@@ -61,3 +61,5 @@ Verlauf:
 27.01.2021 - Funktionen um Texte auszugeben wurden komprimiert. Weiterhin wurde der Code kommentiert.
 
 28.01.2021 - Randuebergang wurde so gemacht, dass wenn z.B. der Virus von unten bzw. von rechts reingehet auch von unten bzw. von rechts rauskommt. Das ermoeglich ein Loch zweimal gleichzeitig zu benutzen. Kommentare wurden hinzugefuegt. 
+
+02.02.2021 - Alle Sounds werden im Header deklariert und initialisiert. Bug mit dem Background Sound wurde beseitigt. Der Sound hat sich immer wieder gestarted, nachdem man das Manue geoeffnet und geschlossen wurde. Die Maske wird jetzt richtig zurueckgesetzt nach dem Gameover.

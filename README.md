@@ -3,6 +3,12 @@ Projekt in Informatikwerstatt - Anwendungsentwicklung
 Gruppe 5
 Silvia, Anastasia, Karla, Gabriel
 
+# Installation
+1.  Pygame_Menu installieren:
+    Im Terminal folgendes eingeben:
+    python -m pip install pygame-menu
+2. Spiel ueber 
+    
 Verlauf:
 25.11.2020 - Objekt startet in der Mitte und kann sich bis zur Rand bewegen.
 

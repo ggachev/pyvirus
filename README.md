@@ -7,9 +7,9 @@ Silvia, Anastasia, Karla, Gabriel
 1.  Pygame_Menu installieren:
     Im Terminal folgendes eingeben:
     python -m pip install pygame-menu
-2. Spiel ueber 
-    
-Verlauf:
+2. Spiel ueber PyVirus.py starten
+
+# Verlauf
 25.11.2020 - Objekt startet in der Mitte und kann sich bis zur Rand bewegen.
 
 26.11.2020 - Objekt wird nach treffen der Rand zurueckgesetzt, versuch kleine Viren zu spawnen

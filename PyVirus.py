@@ -428,7 +428,7 @@ def gameOver(zustand, eigenschaftenHauptvirus, virenKette, highscore, name, eige
     zustand = zustandsliste[4]
     # Quelle: https://www.youtube.com/watch?v=XJSnaeOcnVs
     # Score Update
-    if int(eigenschaftenHauptvirus["Laenge"]) >= int(highscore):
+    if int(eigenschaftenHauptvirus["Laenge"]) > int(highscore):
         # Sound abspielen, gewonnen
         # Ton: https://www.youtube.com/watch?v=xP1b_uRx5x4
         if tonaktiv:

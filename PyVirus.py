@@ -90,7 +90,7 @@ gameOverSound = pygame.mixer.Sound('Sound_GameOver.wav')
 gameOverSound.set_volume(0.2)
 
 gewonnenSound = pygame.mixer.Sound('Sound_Gewonnen.mp3')
-gewonnenSound.set_volume(0.2)
+gewonnenSound.set_volume(0.6)
 
 virusSound = pygame.mixer.Sound('Sound_Viren.mp3')
 virusSound.set_volume(0.2)

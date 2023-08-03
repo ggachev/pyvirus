@@ -7,7 +7,7 @@ Silvia, Anastasia, Karla, Gabriel
 1.  Pygame_Menu installieren:
     Im Terminal folgendes eingeben:
     python -m pip install pygame-menu
-2. Spiel ueber PyVirus.py starten
+3. Spiel ueber PyVirus.py starten (Kann nur über eine IDE gestartet werden, z. B. PyCharm)
 
 # Verlauf
 25.11.2020 - Objekt startet in der Mitte und kann sich bis zur Rand bewegen.
